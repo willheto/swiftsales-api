@@ -19,5 +19,10 @@ $router->get('/', function () use ($router) {
 });
 
 
-$router->post('user/login', ['middleware' => App\Http\Middleware\CorsMiddleware::class, 'uses' => 'User\UserAuthController@login']);
-$router->post('user/auth', ['middleware' => App\Http\Middleware\CorsMiddleware::class, 'uses' => 'User\UserAuthController@authenticate']);
+$router->group(['middleware' => App\Http\Middleware\CorsMiddleware::class], function ($router) {
+    $router->post('user/login', 'User\UserAuthController@login');
+    $router->post('user/auth', 'User\UserAuthController@authenticate');
+
+    $router->get('users/{userID}/leads', 'Lead\LeadsController@getAllByUserID');
+    // Add more routes here...
+});

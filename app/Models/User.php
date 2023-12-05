@@ -25,6 +25,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $doNotUpdate = ['email'];
     protected $hidden = ['password'];
 
+
     public function getValidationRules()
     {
         return [
@@ -33,5 +34,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             'email' => ['email', 'required', 'unique:users'],
             'password' => ['string', 'required', 'min:8']
         ];
+    }
+
+    public function leads()
+    {
+        return $this->hasMany(Lead::class, 'userID', 'userID');
     }
 }

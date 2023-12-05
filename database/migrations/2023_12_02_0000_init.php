@@ -27,6 +27,19 @@ class init extends Migration
             $table->string('password', 200);
             $table->timestamps();
         });
+
+        Schema::create('leads', function (Blueprint $table) {
+            $table->increments('leadID');
+            $table->unsignedInteger('userID');
+            $table->string('businessID', 100);
+            $table->string('companyName', 100);
+            $table->string('contactPerson', 100);
+            $table->string('contactPhone', 100);
+            $table->string('contactEmail', 100);
+            $table->string('header', 100);
+            $table->string('description', 1000);
+            $table->timestamps();
+        });
     }
 
     /**
