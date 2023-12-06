@@ -40,4 +40,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(Lead::class, 'userID', 'userID');
     }
+    public function salesAppointments()
+    {
+        return $this->hasMany(SalesAppointment::class, 'userID', 'userID');
+    }
 }

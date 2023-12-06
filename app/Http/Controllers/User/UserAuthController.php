@@ -27,7 +27,7 @@ class UserAuthController extends BaseController
 
             return response()->json(['user' => $user->toArray()]);
         } catch (Exception $e) {
-            return response($e->getMessage(), $e->getCode());
+            return $this->handleError($e);
         }
     }
 
@@ -44,20 +44,20 @@ class UserAuthController extends BaseController
 
             $password = $request->password;
             if (empty($user) || Hash::check($password, $user->password) === false) {
-                throw new Exception('Invalid credentials', 401);
+                return response()->json(['error' => 'Invalid credentials'], 401);
             }
 
             $payload = [
                 'iss' => "swiftsales-api",
                 'iat' => time(),
-                'exp' => time() + 60 * 60,
+                'exp' => time() + 60 * 60 * 10,
                 'userID' => $user->userID
             ];
 
             $jwt = JWT::encode($payload, env('JWT_SECRET'), 'HS256');
             return response()->json(['token' => $jwt, 'user' => $user->toArray()]);
         } catch (Exception $e) {
-            return response($e->getMessage(), $e->getCode());
+            return $this->handleError($e);
         }
     }
 }

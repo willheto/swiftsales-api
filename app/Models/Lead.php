@@ -23,12 +23,12 @@ class Lead extends Model implements AuthenticatableContract, AuthorizableContrac
         'companyName',
         'contactPerson',
         'contactPhone',
-        'contactEmail'
+        'contactEmail',
+        'header',
+        'description'
     ];
 
-    protected array $doNotUpdate = ['userID'];
-
-    public function getValidationRules()
+    public static function getValidationRules()
     {
         return [
             'businessID' => ['string'],

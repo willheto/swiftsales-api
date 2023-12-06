@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Lead;
+use App\Models\SalesAppointment;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,17 +17,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::factory()->count(10)->create();
-
-        $testUser = [
-            'firstName' => 'Henri',
-            'lastName' => 'Willman',
-            'email' => 'henri.willman@swiftsales.fi',
-            'password' => password_hash('test', PASSWORD_BCRYPT)
-        ];
-
-        User::create($testUser);
-
-        Lead::factory()->count(100)->create();
+        $this->call([
+            UsersSeeder::class,
+            LeadsSeeder::class,
+            SalesAppointmentsSeeder::class,
+        ]);
     }
 }
