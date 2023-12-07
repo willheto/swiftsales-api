@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y git
     sudo apt install net-tools
     sudo apt-get install -y supervisor
+    sudo apt install dos2unix
     apt-get -y install php8.1-fpm php8.1-mysql php8.1-curl zip unzip php8.1-zip php8.1-xdebug php8.1-xml php8.1-mbstring php8.1-gd php8.1-apcu php8.1-intl php8.1-soap php8.1-bcmath
 
     curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version="mariadb-10.11"
@@ -22,7 +23,9 @@ Vagrant.configure("2") do |config|
 
     echo -e "[mariadb]\ngeneral_log_file=/var/log/mysql/general.log\ngeneral_log=0" >> /etc/mysql/mariadb.cnf
 
-    # add user(s) for the database
+    
+
+    # add user for the database
     sudo mysql --user=root --execute="CREATE USER 'swiftsales'@'localhost' IDENTIFIED BY 'test'; GRANT ALL PRIVILEGES ON *.* TO 'swiftsales'@'localhost' WITH GRANT OPTION;"
 
     # Settings from 000_databaseSettings.php
@@ -31,7 +34,10 @@ Vagrant.configure("2") do |config|
 
     # Migrate and seed
     cd /var/www/html/
-    ./initialize_local_db.sh
+    composer install
+    sudo dos2unix initialize_local_db.sh
+    sudo dos2unix after-up.sh
+    sudo bash initialize_local_db.sh
 
     # Additional setup steps for your Lumen project
     # Navigate to your project directory, install dependencies, etc.
