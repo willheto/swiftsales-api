@@ -7,6 +7,9 @@ use App\Models\SalesAppointment;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use App\Models\SalesAppointmentFile;
+use App\Managers\UploadManager\UploadManager;
+use Illuminate\Support\Facades\DB;
 
 class SalesAppointmentsController extends BaseController
 {
@@ -19,7 +22,11 @@ class SalesAppointmentsController extends BaseController
     public function getAllByUserID($userID)
     {
         try {
-            $salesAppointments = SalesAppointment::with('lead')->where('userID', $userID)->get();
+            $salesAppointments = SalesAppointment::with('lead')
+                ->where('userID', $userID)
+                ->with('salesAppointmentFiles')
+                ->get();
+
             return $this->createResponseData($salesAppointments, 'array');
         } catch (Exception $e) {
             return $this->handleError($e);
@@ -29,7 +36,11 @@ class SalesAppointmentsController extends BaseController
     public function getSingle($userID, $salesAppointmentID)
     {
         try {
-            $salesAppointment = SalesAppointment::where('userID', $userID)->where('salesAppointmentID', $salesAppointmentID)->first();
+            $salesAppointment = SalesAppointment::where('userID', $userID)
+                ->where('salesAppointmentID', $salesAppointmentID)
+                ->with('salesAppointmentFiles')
+                ->first();
+
             return $this->createResponseData($salesAppointment, 'object');
         } catch (Exception $e) {
             return $this->handleError($e);
@@ -39,8 +50,24 @@ class SalesAppointmentsController extends BaseController
     public function create(Request $request)
     {
         try {
-            $this->validate($request, SalesAppointment::getValidationRules());
+            DB::beginTransaction();
+
             $salesAppointment = SalesAppointment::create($request->all());
+
+            if ($request->salesAppointmentFiles) {
+                foreach ($request->salesAppointmentFiles as $salesAppointmentFile) {
+                    $base64File = $salesAppointmentFile['base64File'];
+                    $fileName = $salesAppointmentFile['fileName'];
+
+                    $file = UploadManager::uploadFile($base64File, $fileName);
+                    SalesAppointmentFile::create([
+                        'fileID' => $file->fileID,
+                        'salesAppointmentID' => $salesAppointment->salesAppointmentID,
+                    ]);
+                }
+            }
+
+            DB::commit();
             return $this->createResponseData($salesAppointment, 'object');
         } catch (Exception $e) {
             return $this->handleError($e);
@@ -50,6 +77,8 @@ class SalesAppointmentsController extends BaseController
     public function update(Request $request)
     {
         try {
+
+            DB::beginTransaction();
             $salesAppointmentID = $request->salesAppointmentID;
             $userID = $request->userID;
 
@@ -62,6 +91,20 @@ class SalesAppointmentsController extends BaseController
             }
 
             $salesAppointment->update($request->except('userID'));
+
+            if ($request->salesAppointmentFiles) {
+                foreach ($request->salesAppointmentFiles as $salesAppointmentFile) {
+                    $base64File = $salesAppointmentFile['base64File'];
+                    $fileName = $salesAppointmentFile['fileName'];
+
+                    $file = UploadManager::uploadFile($base64File, $fileName);
+                    SalesAppointmentFile::create([
+                        'fileID' => $file->fileID,
+                        'salesAppointmentID' => $salesAppointment->salesAppointmentID,
+                    ]);
+                }
+            }
+            DB::commit();
             return $this->createResponseData($salesAppointment, 'object');
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->validator->errors()], 400);

@@ -8,16 +8,18 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-
-class SalesAppointment extends Model implements AuthenticatableContract, AuthorizableContract
+class SalesAppointment extends BaseModel implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasFactory;
 
     protected $primaryKey = 'salesAppointmentID';
     protected $table = 'salesAppointments';
     protected $foreignKey = ['userID', 'leadID'];
-
 
     protected $fillable = [
         'userID',
@@ -27,13 +29,25 @@ class SalesAppointment extends Model implements AuthenticatableContract, Authori
         'notes',
     ];
 
-    public function user()
+    protected $salesAppointmentFiles;
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'userID', 'userID');
     }
 
-    public function lead()
+    public function lead(): HasOne
     {
-        return $this->belongsTo(Lead::class, 'leadID', 'leadID');
+        return $this->hasOne(Lead::class, 'leadID', 'leadID');
+    }
+
+    public function salesAppointmentFiles(): HasMany
+    {
+        return $this->hasMany(SalesAppointmentFile::class, 'salesAppointmentID', 'salesAppointmentID')->with('file');
+    }
+
+    public function files(): HasManyThrough
+    {
+        return $this->hasManyThrough(File::class, SalesAppointmentFile::class, 'salesAppointmentID', 'fileID', 'salesAppointmentID', 'fileID');
     }
 }

@@ -46,13 +46,30 @@ class init extends Migration
             $table->increments('salesAppointmentID');
             $table->unsignedInteger('userID');
             $table->unsignedInteger('leadID');
-            $table->dateTime('timeStart')->nullable();
-            $table->dateTime('timeEnd')->nullable();
             $table->string('notes', 1000)->default('');
             $table->timestamps();
 
             $table->foreign('userID')->references('userID')->on('users')->onDelete('cascade');
             $table->foreign('leadID')->references('leadID')->on('leads')->onDelete('cascade');
+        });
+
+        Schema::create('files', function (Blueprint $table) {
+            $table->increments('fileID');
+            $table->string('fileName');
+            $table->string('filePath');
+            $table->timestamps();
+        });
+
+        Schema::create('salesAppointmentFiles', function (Blueprint $table) {
+            $table->increments('salesAppointmentFileID');
+            $table->unsignedInteger('fileID');
+            $table->unsignedInteger('salesAppointmentID');
+            $table->timestamps();
+
+            $table->foreign('fileID')->references('fileID')->on('files')->onDelete('cascade');
+            $table->foreign('salesAppointmentID')->references('salesAppointmentID')->on('salesAppointments')->onDelete('cascade');
+
+            $table->unique(['fileID', 'salesAppointmentID']);
         });
     }
 

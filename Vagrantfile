@@ -35,6 +35,7 @@ Vagrant.configure("2") do |config|
     # Migrate and seed
     cd /var/www/html/
     composer install
+
     sudo dos2unix initialize_local_db.sh
     sudo dos2unix after-up.sh
     sudo bash initialize_local_db.sh

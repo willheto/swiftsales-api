@@ -25,18 +25,11 @@ class SalesAppointmentFactory extends Factory
     {
         $userID = rand(1, 11);
         $leadID = rand(1, 100);
-
-        $faker = Faker::create();
-        $timeStart = $faker->dateTimeBetween('now', '+1 week')->format('Y-m-d H:i:s');
-        $timeEnd = $faker->dateTimeBetween($timeStart, $timeStart . '+1 hour')->format('Y-m-d H:i:s');
-        
         $notes = $this->faker->paragraph;
 
         return [
             'userID' => $userID,
             'leadID' => $leadID,
-            'timeStart' => $timeStart,
-            'timeEnd' => $timeEnd,
             'notes' => $notes,
         ];
     }
