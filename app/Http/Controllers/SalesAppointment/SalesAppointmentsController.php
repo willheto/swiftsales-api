@@ -4,12 +4,15 @@ namespace App\Http\Controllers\SalesAppointment;
 
 use App\Http\Controllers\BaseController;
 use App\Models\SalesAppointment;
+use App\Models\SalesAppointmentFile;
+
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
-use App\Models\SalesAppointmentFile;
-use App\Managers\UploadManager\UploadManager;
 use Illuminate\Support\Facades\DB;
+use App\Managers\UploadManager\UploadManager;
+use App\Managers\DailyCoManager\DailyCoManager;
+
 
 class SalesAppointmentsController extends BaseController
 {
@@ -33,11 +36,10 @@ class SalesAppointmentsController extends BaseController
         }
     }
 
-    public function getSingle($userID, $salesAppointmentID)
+    public function getSingle($salesAppointmentID)
     {
         try {
-            $salesAppointment = SalesAppointment::where('userID', $userID)
-                ->where('salesAppointmentID', $salesAppointmentID)
+            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)
                 ->with('salesAppointmentFiles')
                 ->first();
 
@@ -52,7 +54,10 @@ class SalesAppointmentsController extends BaseController
         try {
             DB::beginTransaction();
 
-            $salesAppointment = SalesAppointment::create($request->all());
+            $meetingUrl = DailyCoManager::createMeetingUrl();
+            $salesAppointmentToSave = $request->all();
+            $salesAppointmentToSave['meetingUrl'] = $meetingUrl['url'];
+            $salesAppointment = SalesAppointment::create($salesAppointmentToSave);
 
             if ($request->salesAppointmentFiles) {
                 foreach ($request->salesAppointmentFiles as $salesAppointmentFile) {

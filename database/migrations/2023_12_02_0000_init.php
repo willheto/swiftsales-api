@@ -47,6 +47,7 @@ class init extends Migration
             $table->unsignedInteger('userID');
             $table->unsignedInteger('leadID');
             $table->string('notes', 1000)->default('');
+            $table->string('meetingUrl', 1000)->default('');
             $table->timestamps();
 
             $table->foreign('userID')->references('userID')->on('users')->onDelete('cascade');

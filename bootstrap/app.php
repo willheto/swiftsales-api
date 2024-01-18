@@ -50,6 +50,7 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | Register Config Files
@@ -77,12 +78,6 @@ $app->configure('app');
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\AuthenticateMiddleware::class,
 ]);
-
-
-$app->middleware([
-    App\Http\Middleware\CorsMiddleware::class,
-]);
-
 
 
 /*

@@ -27,6 +27,7 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
         'timeStart',
         'timeEnd',
         'notes',
+        'meetingUrl'
     ];
 
     protected $salesAppointmentFiles;
