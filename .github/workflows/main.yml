@@ -23,7 +23,7 @@ jobs:
             - name: Checkout and pull changes from the dev branch
               if: github.ref == 'refs/heads/dev'
               run: |
-                  sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo git reset --hard && sudo git pull'
+                  sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && git checkout dev && sudo git reset --hard && sudo git pull'
 
             - name: Composer install
               if: github.ref == 'refs/heads/dev'
