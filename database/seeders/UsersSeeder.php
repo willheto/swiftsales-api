@@ -5,8 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Lead;
-use App\Models\SalesAppointment;
 
 class UsersSeeder extends Seeder
 {
@@ -19,13 +17,34 @@ class UsersSeeder extends Seeder
     {
         User::factory()->count(10)->create();
 
-        $testUser = [
+        $henri = [
             'firstName' => 'Henri',
             'lastName' => 'Willman',
             'email' => 'henri.willman@swiftsales.fi',
             'password' => password_hash('test', PASSWORD_BCRYPT)
         ];
 
-        User::create($testUser);
+        $otto = [
+            'firstName' => 'Otto',
+            'lastName' => 'Örn',
+            'email' => 'otto.orn@swiftsales.fi',
+        ];
+
+        $santeri = [
+            'firstName' => 'Santeri',
+            'lastName' => 'Pohjakallio',
+            'email' => 'santeri.pohjakallio@swiftsales.fi'
+        ];
+
+        $miska = [
+            'firstName' => 'Miska',
+            'lastName' => 'Lampinen',
+            'email' => 'miska.lampinen@swiftsales.fi'
+        ];
+
+        User::create($henri);
+        User::create($otto);
+        User::create($santeri);
+        User::create($miska);
     }
 }
