@@ -34,7 +34,7 @@ class LeadFactory extends Factory
         $contactEmail = iconv('UTF-8', 'ASCII//TRANSLIT', $firstName . '.' . $lastName . rand(0, 99) . '@' . 'swiftsales' . '.fi');
         $header = $faker->sentence;
         $description = $faker->paragraph;
-        $userID = rand(1, 11);
+        $userID = rand(1, 14);
 
         return [
             'userID' => $userID,
