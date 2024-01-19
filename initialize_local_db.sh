@@ -4,8 +4,7 @@ DATABASE_NAME="swiftsalesLocal"
 
 sudo mysql -u root --execute="CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME};"
 
-sudo rm -rf ./storage/app/private/*
-sudo rm -rf ./storage/app/public/*
+sudo rm -rf ./public/uploads/*
 
 export APP_ENV=local
 export QUEUE_CONNECTION=sync
