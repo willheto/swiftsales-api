@@ -28,18 +28,21 @@ class UsersSeeder extends Seeder
             'firstName' => 'Otto',
             'lastName' => 'Örn',
             'email' => 'otto.orn@swiftsales.fi',
+            'password' => password_hash('test', PASSWORD_BCRYPT)
         ];
 
         $santeri = [
             'firstName' => 'Santeri',
             'lastName' => 'Pohjakallio',
-            'email' => 'santeri.pohjakallio@swiftsales.fi'
+            'email' => 'santeri.pohjakallio@swiftsales.fi',
+            'password' => password_hash('test', PASSWORD_BCRYPT)
         ];
 
         $miska = [
             'firstName' => 'Miska',
             'lastName' => 'Lampinen',
-            'email' => 'miska.lampinen@swiftsales.fi'
+            'email' => 'miska.lampinen@swiftsales.fi',
+            'password' => password_hash('test', PASSWORD_BCRYPT)
         ];
 
         User::create($henri);
