@@ -25,7 +25,7 @@ class SalesAppointmentFactory extends Factory
     public function definition()
     {
         $userID = User::all()->random()->userID;
-        $leadID = Lead::all()->random()->leadID;
+        $leadID = Lead::where('userID', $userID)->get()->random()->leadID;
         $notes = $this->faker->paragraph;
 
         return [
