@@ -23,7 +23,6 @@ class DailyCoManager
                 ],
             ]);
 
-        Log::error($response->json());
         $expiryTime = $this->secondsToMariaDBDate($response->json()['config']['exp']);
         $meeting = $response->json();
         $meeting['expiryTime'] = $expiryTime;
