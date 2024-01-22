@@ -48,6 +48,7 @@ class init extends Migration
             $table->unsignedInteger('leadID');
             $table->string('notes', 1000)->default('');
             $table->string('meetingUrl', 1000)->default('');
+            $table->boolean('isCustomerAllowedToShareFiles')->default(false);
             $table->timestamps();
 
             $table->foreign('userID')->references('userID')->on('users')->onDelete('cascade');

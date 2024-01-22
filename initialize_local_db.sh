@@ -4,10 +4,6 @@ DATABASE_NAME="swiftsalesLocal"
 
 sudo mysql -u root --execute="CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME};"
 
-# Remove uploaded files
-sudo rm -rf ./public/*
-sudo mkdir ./public/uploads
-
 export APP_ENV=local
 export QUEUE_CONNECTION=sync
 php artisan migrate:fresh --seed

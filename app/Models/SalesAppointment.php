@@ -21,13 +21,18 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
     protected $table = 'salesAppointments';
     protected $foreignKey = ['userID', 'leadID'];
 
+    protected $casts = [
+        'isCustomerAllowedToShareFiles' => 'boolean',
+    ];
+
     protected $fillable = [
         'userID',
         'leadID',
         'timeStart',
         'timeEnd',
         'notes',
-        'meetingUrl'
+        'meetingUrl',
+        'isCustomerAllowedToShareFiles'
     ];
 
     protected $salesAppointmentFiles;
