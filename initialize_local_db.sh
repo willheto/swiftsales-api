@@ -11,7 +11,7 @@ php artisan migrate:fresh --seed
 # Restart PHP process to clear caches
 sudo service php8.1-fpm restart
 
-/var/www/html/after-up.sh
+/var/www/swiftsales-api/after-up.sh
 
 # Exit with success
 exit 0
