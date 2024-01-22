@@ -3,12 +3,12 @@
 ## wrong :D Ask Henkka for help if you need to modify this file for some reason.
 
 Vagrant.configure("2") do |config|
-  desired_directory = "/var/www/html"
+  desired_directory = "/var/www/swiftsales-api"
   config.ssh.shell = "bash -c 'cd #{desired_directory}; exec bash'"
 	config.vm.box = "bento/ubuntu-22.04"
   config.vm.network "private_network", ip: "192.168.33.10"
   config.vm.network "forwarded_port", guest: 8000, host: 8000
-  config.vm.synced_folder ".", "/var/www/html"  # Sync current folder to VM
+  config.vm.synced_folder ".", "/var/www/swiftsales-api" # Sync current folder to VM
   config.vm.hostname = "swiftsales-api-local"
   config.vm.provider "virtualbox" do |vb|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
     sudo systemctl enable nginx
     vagrant sudo systemctl start nginx
     sudo rm /etc/nginx/sites-enabled/default
-    sudo ln -s /var/www/html/nginx/nginx.local.conf /etc/nginx/sites-enabled/
+    sudo ln -s /var/www/swiftsales-api/nginx/nginx.local.conf /etc/nginx/sites-enabled/
     sudo nginx -s reload
 
     # Change nginx.conf sendfile to off
@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
     sudo service mysql restart
 
     # Install guzzle and run composer install
-    cd /var/www/html/
+    cd /var/www/swiftsales-api/
     composer install
     composer require guzzlehttp/guzzle
 
@@ -68,7 +68,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "swiftsales-api-local" do |mt|
 		mt.trigger.after :up do |trigger|
 			trigger.info = "Running after-up..."
-			trigger.run_remote = {inline: "bash /var/www/html/after-up.sh"}
+			trigger.run_remote = {inline: "bash /var/www/swiftsales-api/after-up.sh"}
 		end
 	end
 end

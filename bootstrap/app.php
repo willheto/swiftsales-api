@@ -91,7 +91,6 @@ $app->routeMiddleware([
 |
 */
 
-$app->register(App\Providers\GoogleCloudStorageServiceProvider::class);
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);

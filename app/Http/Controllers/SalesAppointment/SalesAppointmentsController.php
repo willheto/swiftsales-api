@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\SalesAppointment;
 
+use App\Exceptions\CustomValidationException\CustomValidationException;
+use App\Exceptions\NotFoundException\NotFoundException;
 use App\Http\Controllers\BaseController;
 use App\Models\SalesAppointment;
 use App\Models\SalesAppointmentFile;
@@ -12,7 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Managers\UploadManager\UploadManager;
 use App\Managers\DailyCoManager\DailyCoManager;
-
+use App\Models\Lead;
+use Illuminate\Support\Facades\Log;
 
 class SalesAppointmentsController extends BaseController
 {
@@ -22,9 +25,10 @@ class SalesAppointmentsController extends BaseController
         $this->CRUD_RESPONSE_OBJECT = 'salesAppointment';
     }
 
-    public function getAllByUserID($userID)
+    public function getAllByUserID(int $userID, Request $request)
     {
         try {
+            $this->verifyAccessToResource($userID, $request);
             $salesAppointments = SalesAppointment::with('lead')
                 ->where('userID', $userID)
                 ->with('salesAppointmentFiles')
@@ -36,9 +40,10 @@ class SalesAppointmentsController extends BaseController
         }
     }
 
-    public function getSingle($salesAppointmentID)
+    public function getSingle(int $userID, int $salesAppointmentID, Request $request)
     {
         try {
+            $this->verifyAccessToResource($userID, $request);
             $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)
                 ->with('salesAppointmentFiles')
                 ->first();
@@ -52,6 +57,17 @@ class SalesAppointmentsController extends BaseController
     public function create(Request $request)
     {
         try {
+            if (!$request->leadID) {
+                throw new CustomValidationException('Lead ID is required');
+            }
+            $lead = Lead::where('leadID', $request->leadID)->first();
+            if (!$lead) {
+                throw new NotFoundException('Lead not found');
+            }
+
+            $userID = $lead->userID;
+            $this->verifyAccessToResource($userID, $request);
+
             DB::beginTransaction();
 
             $meetingUrl = DailyCoManager::createMeetingUrl();
@@ -64,7 +80,8 @@ class SalesAppointmentsController extends BaseController
                     $base64File = $salesAppointmentFile['base64File'];
                     $fileName = $salesAppointmentFile['fileName'];
 
-                    $file = UploadManager::uploadFile($base64File, $fileName);
+                    $uploadManager = new UploadManager();
+                    $file = $uploadManager->handleuploadFile($base64File, $fileName);
                     SalesAppointmentFile::create([
                         'fileID' => $file->fileID,
                         'salesAppointmentID' => $salesAppointment->salesAppointmentID,
@@ -82,19 +99,20 @@ class SalesAppointmentsController extends BaseController
     public function update(Request $request)
     {
         try {
+            if (!$request->salesAppointmentID) {
+                throw new CustomValidationException('SalesAppointment ID is required');
+            }
+
+            $salesAppointmentID = $request->salesAppointmentID;
+            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->first();
+
+            if (!$salesAppointment) {
+                throw new NotFoundException('SalesAppointment not found');
+            }
+
+            $this->verifyAccessToResource($salesAppointment->userID, $request);
 
             DB::beginTransaction();
-            $salesAppointmentID = $request->salesAppointmentID;
-            $userID = $request->userID;
-
-            if (!$salesAppointmentID) {
-                return response()->json(['error' => 'SalesAppointment ID is required'], 400);
-            }
-            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->where('userID', $userID)->first();
-            if (!$salesAppointment) {
-                return response()->json(['error' => 'SalesAppointment not found'], 404);
-            }
-
             $salesAppointment->update($request->except('userID'));
 
             if ($request->salesAppointmentFiles) {
@@ -102,7 +120,9 @@ class SalesAppointmentsController extends BaseController
                     $base64File = $salesAppointmentFile['base64File'];
                     $fileName = $salesAppointmentFile['fileName'];
 
-                    $file = UploadManager::uploadFile($base64File, $fileName);
+                    $uploadManager = new UploadManager();
+
+                    $file = $uploadManager->handleuploadFile($base64File, $fileName);
                     SalesAppointmentFile::create([
                         'fileID' => $file->fileID,
                         'salesAppointmentID' => $salesAppointment->salesAppointmentID,
@@ -121,13 +141,18 @@ class SalesAppointmentsController extends BaseController
     public function deleteSingle(Request $request)
     {
         try {
-            $salesAppointmentID = $request->salesAppointmentID;
-            $userID = $request->userID;
-
-            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->where('userID', $userID)->first();
-            if (!$salesAppointment) {
-                return response()->json(['error' => 'SalesAppointment not found'], 404);
+            if (!$request->salesAppointmentID) {
+                throw new CustomValidationException('SalesAppointment ID is required');
             }
+
+            $salesAppointmentID = $request->salesAppointmentID;
+            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->first();
+            if (!$salesAppointment) {
+                throw new NotFoundException('SalesAppointment not found');
+            }
+
+            $userIDInSalesAppointment = $salesAppointment->userID;
+            $this->verifyAccessToResource($userIDInSalesAppointment, $request);
             $salesAppointment->delete();
             return response()->json(['success' => 'SalesAppointment deleted'], 200);
         } catch (Exception $e) {

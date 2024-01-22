@@ -7,7 +7,39 @@ use App\Models\File;
 class UploadManager
 {
 
-    public static function uploadFile($base64File, $fileName)
+    public function handleuploadFile($base64File, $fileName)
+    {
+        $fileType = mime_content_type($base64File);
+        $this->checkIfFileTypeIsValid($fileType);
+
+        $fileData = $this->decodeBase64File($base64File);
+        $this->saveFile($fileData, $fileName);
+        
+        $fileUrl = url('uploads/' . $fileName);
+        // Create a new File record
+        $file = File::create([
+            'fileName' => $fileName,
+            'filePath' => $fileUrl,
+        ]);
+
+        return $file;
+    }
+
+    protected function saveFile($fileData, $fileName)
+    {
+        $filePath = app()->basePath('public') . '/uploads/' . $fileName;
+        file_put_contents($filePath, $fileData);
+    }
+
+    protected function decodeBase64File($base64File): string
+    {
+        $base64data = explode(',', $base64File, 2)[1];
+        $fileData = base64_decode($base64data);
+
+        return $fileData;
+    }
+
+    protected function checkIfFileTypeIsValid($fileType)
     {
         $allowedMimeTypes = [
             'image/jpeg',
@@ -29,28 +61,8 @@ class UploadManager
             'application/rtf', // RTF
         ];
 
-        // only allow image file types
-        if (!in_array(mime_content_type($base64File), $allowedMimeTypes)) {
-            throw new \Exception('Invalid file type: ' . mime_content_type($base64File));
+        if (!in_array($fileType, $allowedMimeTypes)) {
+            throw new \Exception('Invalid file type: ' . $fileType);
         }
-
-        $base64data = explode(',', $base64File, 2)[1];
-        // Decode base64 to binary data
-        $fileData = base64_decode($base64data);
-
-        // save file to public/uploads
-        $filePath = app()->basePath('public') . '/uploads/' . $fileName;
-
-        file_put_contents($filePath, $fileData);
-
-        $fileUrl = url('uploads/' . $fileName);
-
-        // Create a new File record
-        $file = File::create([
-            'fileName' => $fileName,
-            'filePath' => $fileUrl,
-        ]);
-
-        return $file;
     }
 }

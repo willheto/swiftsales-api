@@ -2,9 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\SalesAppointment;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Faker\Factory as Faker;
+use App\Models\SalesAppointment;
+use App\Models\User;
+use App\Models\Lead;
 
 
 class SalesAppointmentFactory extends Factory
@@ -23,8 +24,8 @@ class SalesAppointmentFactory extends Factory
      */
     public function definition()
     {
-        $userID = rand(1, 14);
-        $leadID = rand(1, 100);
+        $userID = User::all()->random()->userID;
+        $leadID = Lead::all()->random()->leadID;
         $notes = $this->faker->paragraph;
 
         return [

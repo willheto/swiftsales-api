@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
@@ -16,38 +15,41 @@ class UsersSeeder extends Seeder
     public function run()
     {
         User::factory()->count(10)->create();
+        $this->createAdminUsers();
+    }
 
-        $henri = [
-            'firstName' => 'Henri',
-            'lastName' => 'Willman',
-            'email' => 'henri.willman@swiftsales.fi',
-            'password' => password_hash('test', PASSWORD_BCRYPT)
+    protected function createAdminUsers()
+    {
+        $swiftsalesAdminUsers = [
+            [
+                'firstName' => 'Henri',
+                'lastName' => 'Willman',
+                'email' => 'henri.willman@swiftsales.fi',
+                'password' => password_hash('test', PASSWORD_BCRYPT)
+            ],
+            [
+                'firstName' => 'Otto',
+                'lastName' => 'Örn',
+                'email' => 'otto.orn@swiftsales.fi',
+                'password' => password_hash('test', PASSWORD_BCRYPT)
+            ],
+            [
+                'firstName' => 'Santeri',
+                'lastName' => 'Pohjakallio',
+                'email' => 'santeri.pohjakallio@swiftsales.fi',
+                'password' => password_hash('test', PASSWORD_BCRYPT)
+            ],
+            [
+                'firstName' => 'Miska',
+                'lastName' => 'Lampinen',
+                'email' => 'miska.lampinen@swiftsales.fi',
+                'password' => password_hash('test', PASSWORD_BCRYPT)
+
+            ]
         ];
 
-        $otto = [
-            'firstName' => 'Otto',
-            'lastName' => 'Örn',
-            'email' => 'otto.orn@swiftsales.fi',
-            'password' => password_hash('test', PASSWORD_BCRYPT)
-        ];
-
-        $santeri = [
-            'firstName' => 'Santeri',
-            'lastName' => 'Pohjakallio',
-            'email' => 'santeri.pohjakallio@swiftsales.fi',
-            'password' => password_hash('test', PASSWORD_BCRYPT)
-        ];
-
-        $miska = [
-            'firstName' => 'Miska',
-            'lastName' => 'Lampinen',
-            'email' => 'miska.lampinen@swiftsales.fi',
-            'password' => password_hash('test', PASSWORD_BCRYPT)
-        ];
-
-        User::create($henri);
-        User::create($otto);
-        User::create($santeri);
-        User::create($miska);
+        foreach ($swiftsalesAdminUsers as $swiftsalesAdminUser) {
+            User::create($swiftsalesAdminUser);
+        }
     }
 }

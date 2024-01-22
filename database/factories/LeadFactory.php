@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Lead;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Faker\Factory as Faker;
 
@@ -26,7 +27,6 @@ class LeadFactory extends Factory
         $faker = Faker::create('fi_FI');
         $firstName = $faker->firstName;
         $lastName = $faker->lastName;
-
         $businessID = $faker->uuid;
         $companyName = $faker->company;
         $contactPerson = $firstName . ' ' . $lastName;
@@ -34,7 +34,7 @@ class LeadFactory extends Factory
         $contactEmail = iconv('UTF-8', 'ASCII//TRANSLIT', $firstName . '.' . $lastName . rand(0, 99) . '@' . 'swiftsales' . '.fi');
         $header = $faker->sentence;
         $description = $faker->paragraph;
-        $userID = rand(1, 14);
+        $userID = User::all()->random()->userID;
 
         return [
             'userID' => $userID,

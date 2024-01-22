@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Lead;
 use App\Http\Controllers\BaseController;
 use App\Models\Lead;
 use Exception;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use App\Exceptions\NotFoundException\NotFoundException;
+use App\Exceptions\CustomValidationException\CustomValidationException;
+use Illuminate\Validation\ValidationException;
 
 class LeadsController extends BaseController
 {
@@ -16,11 +18,10 @@ class LeadsController extends BaseController
         $this->CRUD_RESPONSE_OBJECT = 'lead';
     }
 
-
-
-    public function getAllByUserID($userID)
+    public function getAllByUserID($userID, Request $request)
     {
         try {
+            $this->verifyAccessToResource($userID, $request);
             $leads = Lead::where('userID', $userID)->get();
             return $this->createResponseData($leads, 'array');
         } catch (Exception $e) {
@@ -28,10 +29,14 @@ class LeadsController extends BaseController
         }
     }
 
-    public function getSingle($userID, $leadID)
+    public function getSingle($userID, $leadID, Request $request)
     {
         try {
+            $this->verifyAccessToResource($userID, $request);
             $lead = Lead::where('userID', $userID)->where('leadID', $leadID)->first();
+            if (!$lead) {
+                throw new NotFoundException('Lead not found');
+            }
             return $this->createResponseData($lead, 'object');
         } catch (Exception $e) {
             return $this->handleError($e);
@@ -44,6 +49,8 @@ class LeadsController extends BaseController
             $this->validate($request, Lead::getValidationRules());
             $lead = Lead::create($request->all());
             return $this->createResponseData($lead, 'object');
+        } catch (ValidationException $e) {
+            return $this->handleError(new CustomValidationException);
         } catch (Exception $e) {
             return $this->handleError($e);
         }
@@ -53,15 +60,13 @@ class LeadsController extends BaseController
     {
         try {
             $leadID = $request->leadID;
-            $userID = $request->userID;
-
-            if (!$leadID) {
-                return response()->json(['error' => 'Lead ID is required'], 400);
-            }
-            $lead = Lead::where('leadID', $leadID)->where('userID', $userID)->first();
+            $lead = Lead::where('leadID', $leadID)->first();
             if (!$lead) {
-                return response()->json(['error' => 'Lead not found'], 404);
+                throw new NotFoundException('Lead not found', 404);
             }
+
+            $userIDInLead = $lead->userID;
+            $this->verifyAccessToResource($userIDInLead, $request);
 
             $lead->update($request->except('userID'));
             return $this->createResponseData($lead, 'object');
@@ -75,13 +80,18 @@ class LeadsController extends BaseController
     public function deleteSingle(Request $request)
     {
         try {
-            $leadID = $request->leadID;
-            $userID = $request->userID;
-
-            $lead = Lead::where('leadID', $leadID)->where('userID', $userID)->first();
-            if (!$lead) {
-                return response()->json(['error' => 'Lead not found'], 404);
+            if (!$request->leadID) {
+                throw new CustomValidationException('Lead ID is required');
             }
+
+            $leadID = $request->leadID;
+            $lead = Lead::where('leadID', $leadID)->first();
+            if (!$lead) {
+                throw new NotFoundException('Lead not found', 404);
+            }
+
+            $userIDInLead = $lead->userID;
+            $this->verifyAccessToResource($userIDInLead, $request);
             $lead->delete();
             return response()->json(['success' => 'Lead deleted'], 200);
         } catch (Exception $e) {
