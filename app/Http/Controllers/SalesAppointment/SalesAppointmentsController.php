@@ -40,6 +40,24 @@ class SalesAppointmentsController extends BaseController
         }
     }
 
+    public function getPublicSalesAppointment(int $salesAppointmentID)
+    {
+        try {
+            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)
+                ->with('lead')
+                ->with('salesAppointmentFiles')
+                ->first();
+
+            if (!$salesAppointment) {
+                throw new NotFoundException('SalesAppointment not found');
+            }
+
+            return $this->createResponseData($salesAppointment, 'object');
+        } catch (Exception $e) {
+            return $this->handleError($e);
+        }
+    }
+
     public function getSingle(int $userID, int $salesAppointmentID, Request $request)
     {
         try {
@@ -70,9 +88,11 @@ class SalesAppointmentsController extends BaseController
 
             DB::beginTransaction();
 
-            $meetingUrl = DailyCoManager::createMeetingUrl();
+            $dailyCoManager = new DailyCoManager();
+            $meetingUrl = $dailyCoManager->createMeetingUrl(24);
             $salesAppointmentToSave = $request->all();
             $salesAppointmentToSave['meetingUrl'] = $meetingUrl['url'];
+            $salesAppointmentToSave['meetingExpiryTime'] = $meetingUrl['expiryTime'];
             $salesAppointment = SalesAppointment::create($salesAppointmentToSave);
 
             if ($request->salesAppointmentFiles) {
@@ -155,6 +175,35 @@ class SalesAppointmentsController extends BaseController
             $this->verifyAccessToResource($userIDInSalesAppointment, $request);
             $salesAppointment->delete();
             return response()->json(['success' => 'SalesAppointment deleted'], 200);
+        } catch (Exception $e) {
+            return $this->handleError($e);
+        }
+    }
+
+    public function renewMeetingUrl(int $salesAppointmentID, Request $request)
+    {
+        try {
+            if (!$request->salesAppointmentID) {
+                throw new CustomValidationException('SalesAppointment ID is required');
+            }
+
+            $salesAppointmentID = $request->salesAppointmentID;
+            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->first();
+            if (!$salesAppointment) {
+                throw new NotFoundException('SalesAppointment not found');
+            }
+
+            $userIDInSalesAppointment = $salesAppointment->userID;
+            $this->verifyAccessToResource($userIDInSalesAppointment, $request);
+
+            $dailyCoManager = new DailyCoManager();
+            $meetingUrl = $dailyCoManager->createMeetingUrl(24);
+            $salesAppointment->update([
+                'meetingUrl' => $meetingUrl['url'],
+                'meetingExpiryTime' => $meetingUrl['expiryTime']
+            ]);
+
+            return $this->createResponseData($salesAppointment, 'object');
         } catch (Exception $e) {
             return $this->handleError($e);
         }

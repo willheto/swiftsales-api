@@ -12,18 +12,14 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
 {
     use Authenticatable, Authorizable, HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
+    protected $primaryKey = 'userID';
+
     protected $fillable = [
-        'firstName', 'lastName', 'email', 'password'
+        'firstName', 'lastName', 'email', 'password', 'timeZone'
     ];
 
     protected $doNotUpdate = ['email'];
     protected $hidden = ['password'];
-
 
     public function getValidationRules()
     {
@@ -31,6 +27,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
             'firstName' => ['string', 'required'],
             'lastName' => ['string', 'required'],
             'email' => ['email', 'required', 'unique:users'],
+            'timeZone' => ['string', 'required'], // TODO: validate timezone
             'password' => ['string', 'required', 'min:8']
         ];
     }

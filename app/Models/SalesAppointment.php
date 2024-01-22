@@ -21,7 +21,10 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
     protected $table = 'salesAppointments';
     protected $foreignKey = ['userID', 'leadID'];
 
+
     protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
         'isCustomerAllowedToShareFiles' => 'boolean',
     ];
 
@@ -32,6 +35,7 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
         'timeEnd',
         'notes',
         'meetingUrl',
+        'meetingExpiryTime',
         'isCustomerAllowedToShareFiles'
     ];
 

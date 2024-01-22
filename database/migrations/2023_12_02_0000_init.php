@@ -23,6 +23,7 @@ class init extends Migration
             $table->string('firstName', 100)->default('');
             $table->string('lastName', 100)->default('');
             $table->string('email', 100)->unique();
+            $table->string('timeZone', 100)->default('Europe/Helsinki');
             $table->string('password', 200);
             $table->timestamps();
         });
@@ -48,6 +49,7 @@ class init extends Migration
             $table->unsignedInteger('leadID');
             $table->string('notes', 1000)->default('');
             $table->string('meetingUrl', 1000)->default('');
+            $table->timestamp('meetingExpiryTime')->nullable();
             $table->boolean('isCustomerAllowedToShareFiles')->default(false);
             $table->timestamps();
 

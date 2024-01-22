@@ -21,10 +21,12 @@ $router->get('/', function () use ($router) {
 // Public endpoints
 $router->post('user/login', 'User\UserAuthController@login');
 $router->post('user/auth', 'User\UserAuthController@authenticate');
-$router->get('sales-appointments/{salesAppointmentID}', 'SalesAppointment\SalesAppointmentsController@getSingle');
+$router->get('sales-appointments/{salesAppointmentID}', 'SalesAppointment\SalesAppointmentsController@getPublicSalesAppointment');
 
 // These endpoints require user authentication
 $router->group(['middleware' => App\Http\Middleware\AuthenticateMiddleware::class], function ($router) {
+    $router->patch('users', 'User\UsersController@update');
+
     $router->get('users/{userID}/leads', 'Lead\LeadsController@getAllByUserID');
     $router->get('users/{userID}/leads/{leadID}', 'Lead\LeadsController@getSingle');
     $router->post('leads', 'Lead\LeadsController@create');
@@ -36,4 +38,5 @@ $router->group(['middleware' => App\Http\Middleware\AuthenticateMiddleware::clas
     $router->post('sales-appointments', 'SalesAppointment\SalesAppointmentsController@create');
     $router->patch('sales-appointments', 'SalesAppointment\SalesAppointmentsController@update');
     $router->delete('sales-appointments', 'SalesAppointment\SalesAppointmentsController@deleteSingle');
+    $router->post('sales-appointments/{salesAppointmentID}/renew-meeting-url', 'SalesAppointment\SalesAppointmentsController@renewMeetingUrl');
 });
