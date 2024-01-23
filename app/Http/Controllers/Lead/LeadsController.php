@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Exceptions\NotFoundException\NotFoundException;
 use App\Exceptions\CustomValidationException\CustomValidationException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class LeadsController extends BaseController
 {
@@ -56,6 +57,28 @@ class LeadsController extends BaseController
         }
     }
 
+    public function createBatch(Request $request)
+    {
+        try {
+            $leadsArray = $request->leads;
+            $userID = $request->userID;
+            $leads = array_map(function ($object) {
+                return (array) $object;
+            }, $leadsArray);
+
+            $leads = array_map(function ($lead) use ($userID) {
+                $lead['userID'] = $userID;
+                return $lead;
+            }, $leads);
+
+            Lead::insert($leads);
+            return $this->createResponseData($leads, 'array');
+        } catch (ValidationException $e) {
+            return $this->handleError(new CustomValidationException);
+        } catch (Exception $e) {
+            return $this->handleError($e);
+        }
+    }
     public function update(Request $request)
     {
         try {

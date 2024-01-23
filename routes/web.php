@@ -30,6 +30,7 @@ $router->group(['middleware' => App\Http\Middleware\AuthenticateMiddleware::clas
     $router->get('users/{userID}/leads', 'Lead\LeadsController@getAllByUserID');
     $router->get('users/{userID}/leads/{leadID}', 'Lead\LeadsController@getSingle');
     $router->post('leads', 'Lead\LeadsController@create');
+    $router->post('leads/batch', 'Lead\LeadsController@createBatch');
     $router->patch('leads', 'Lead\LeadsController@update');
     $router->delete('leads', 'Lead\LeadsController@deleteSingle');
 

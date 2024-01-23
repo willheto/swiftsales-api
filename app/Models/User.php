@@ -15,10 +15,9 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     protected $primaryKey = 'userID';
 
     protected $fillable = [
-        'firstName', 'lastName', 'email', 'password', 'timeZone'
+        'firstName', 'lastName', 'email', 'password', 'timeZone', 'userType', 'organization'
     ];
 
-    protected $doNotUpdate = ['email'];
     protected $hidden = ['password'];
 
     public function getValidationRules()
@@ -28,6 +27,8 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
             'lastName' => ['string', 'required'],
             'email' => ['email', 'required', 'unique:users'],
             'timeZone' => ['string', 'required'], // TODO: validate timezone
+            'userType' => ['string', 'required', 'in:user,admin'],
+            'organization' => ['string', 'nullable'],
             'password' => ['string', 'required', 'min:8']
         ];
     }
@@ -36,8 +37,14 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     {
         return $this->hasMany(Lead::class, 'userID', 'userID');
     }
+
     public function salesAppointments()
     {
         return $this->hasMany(SalesAppointment::class, 'userID', 'userID');
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'organizationID', 'organizationID');
     }
 }

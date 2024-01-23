@@ -9,7 +9,6 @@ use App\Exceptions\NotFoundException\NotFoundException;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Log;
 
 
 class UsersController extends BaseController
@@ -24,7 +23,7 @@ class UsersController extends BaseController
     {
         try {
             $userID = $request->userID;
-            $user = User::where('userID', $userID)->first();
+            $user = User::where('userID', $userID)->with('organization')->first();
             if (!$user) {
                 throw new NotFoundException('User not found');
             }

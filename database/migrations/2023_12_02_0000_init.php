@@ -18,14 +18,37 @@ class init extends Migration
         /**
          * Lumen table, required for DB job queue
          */
+        Schema::create('organizations', function (Blueprint $table) {
+            $table->increments('organizationID');
+            $table->string('organizationName', 100)->default('');
+            $table->string('licenseType', 100)->default('basic');
+            $table->timestamps();
+        });
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('userID');
+            $table->unsignedInteger('organizationID');
             $table->string('firstName', 100)->default('');
             $table->string('lastName', 100)->default('');
             $table->string('email', 100)->unique();
             $table->string('timeZone', 100)->default('Europe/Helsinki');
+            $table->string('userType', 20)->default('user');
             $table->string('password', 200);
             $table->timestamps();
+
+            $table->foreign('organizationID')->references('organizationID')->on('organizations')->onDelete('cascade');
+        });
+
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->increments('jobID');
+            $table->unsignedInteger('userID');
+            $table->boolean('isSuccessful')->default(false);
+            $table->string('jobType', 100)->default('');
+            $table->string('status', 100)->default('');
+            $table->string('errorMessage', 1000)->nullable();
+            $table->timestamps();
+
+            $table->foreign('userID')->references('userID')->on('users')->onDelete('cascade');
         });
 
         Schema::create('leads', function (Blueprint $table) {
