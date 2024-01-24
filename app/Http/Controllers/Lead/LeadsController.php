@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Exceptions\NotFoundException\NotFoundException;
 use App\Exceptions\CustomValidationException\CustomValidationException;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Log;
+use App\Managers\ImportManager\ImportManager;
 
 class LeadsController extends BaseController
 {
@@ -62,14 +62,9 @@ class LeadsController extends BaseController
         try {
             $leadsArray = $request->leads;
             $userID = $request->userID;
-            $leads = array_map(function ($object) {
-                return (array) $object;
-            }, $leadsArray);
 
-            $leads = array_map(function ($lead) use ($userID) {
-                $lead['userID'] = $userID;
-                return $lead;
-            }, $leads);
+            $importManager = new ImportManager;
+            $leads = $importManager->importLeads($leadsArray, $userID);
 
             Lead::insert($leads);
             return $this->createResponseData($leads, 'array');
@@ -79,6 +74,7 @@ class LeadsController extends BaseController
             return $this->handleError($e);
         }
     }
+
     public function update(Request $request)
     {
         try {
