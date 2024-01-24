@@ -35,4 +35,14 @@ jobs:
               run: |
                   sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo bash initialize_local_db.sh'
 
+            - name: Restart nginx
+              if: github.ref == 'refs/heads/dev'
+              run: |
+                  sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'sudo systemctl restart nginx'
+
+            - name: Make sure the uploads folder is owned by www-data
+              if: github.ref == 'refs/heads/dev'
+              run: |
+                  sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/'
+
             
