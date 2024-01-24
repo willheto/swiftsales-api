@@ -13,7 +13,7 @@ rm -rf /var/www/swiftsales-api/public/uploads/*
 # Restart PHP process to clear caches
 sudo service php8.1-fpm restart
 
-/var/www/swiftsales-api/after-up.sh
+sudo /var/www/swiftsales-api/after-up.sh
 
 # Exit with success
 exit 0
