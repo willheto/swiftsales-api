@@ -8,7 +8,7 @@ export APP_ENV=local
 export QUEUE_CONNECTION=sync
 php artisan migrate:fresh --seed
 
-rm -rf /var/www/swiftsales-api/public/*
+rm -rf /var/www/swiftsales-api/public/uploads/*
 
 # Restart PHP process to clear caches
 sudo service php8.1-fpm restart
