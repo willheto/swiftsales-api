@@ -63,6 +63,10 @@ Vagrant.configure("2") do |config|
 
     # Run migration and seed database
     sudo bash initialize_local_db.sh
+
+    # Change permissions for uploads folder
+    sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/
+
   SHELL
 
   config.vm.define "swiftsales-api-local" do |mt|
