@@ -188,7 +188,7 @@ class SalesAppointmentsController extends BaseController
     public function renewMeetingUrl(int $salesAppointmentID, Request $request): JsonResponse
     {
         try {
-            if (!$request->json('salesAppointmentID')) {
+            if (!$salesAppointmentID) {
                 throw new CustomValidationException('SalesAppointment ID is required');
             }
 
