@@ -192,7 +192,6 @@ class SalesAppointmentsController extends BaseController
                 throw new CustomValidationException('SalesAppointment ID is required');
             }
 
-            $salesAppointmentID = $request->json('salesAppointmentID');
             $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->first();
             if (!$salesAppointment) {
                 throw new NotFoundException('SalesAppointment not found');
