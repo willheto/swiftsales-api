@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class AuthManager
 {
 
-    public function verifyAccess($userID, Request $request)
+    public function verifyAccess(int $userID, Request $request): void
     {
         $userIDFromToken = $request->userID;
         if ($userID != $userIDFromToken) {

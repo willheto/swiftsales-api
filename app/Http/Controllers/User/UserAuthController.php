@@ -9,14 +9,15 @@ use Illuminate\Support\Facades\Hash;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Illuminate\Http\JsonResponse;
 
 class UserAuthController extends BaseController
 {
 
-    public function authenticate(Request $request)
+    public function authenticate(Request $request): JsonResponse
     {
         try {
-            $token = $request->token;
+            $token = $request->json('token');
             $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
             $userID = $decoded->userID;
             $user = User::where('userID', $userID)->with('organization')->first();
@@ -31,7 +32,7 @@ class UserAuthController extends BaseController
         }
     }
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         try {
             $this->validate($request, [
@@ -39,10 +40,10 @@ class UserAuthController extends BaseController
                 'password' => 'required'
             ]);
 
-            $email = $request->email;
+            $email = $request->json('email');
             $user = User::where('email', $email)->with('organization')->first();
 
-            $password = $request->password;
+            $password = $request->json('password');
             if (empty($user) || Hash::check($password, $user->password) === false) {
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }

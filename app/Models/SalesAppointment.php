@@ -19,7 +19,11 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
 
     protected $primaryKey = 'salesAppointmentID';
     protected $table = 'salesAppointments';
-    protected $foreignKey = ['userID', 'leadID'];
+
+    /**
+     * @var string[]
+     */
+    protected $foreignKey  = ['userID', 'leadID'];
 
 
     protected $casts = [
@@ -39,7 +43,7 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
         'isCustomerAllowedToShareFiles'
     ];
 
-    protected $salesAppointmentFiles;
+    protected SalesAppointmentFile $salesAppointmentFiles;
 
     public function user(): BelongsTo
     {

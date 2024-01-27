@@ -49,6 +49,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        # @phpstan-ignore-next-line
         return parent::render($request, $exception);
     }
 }

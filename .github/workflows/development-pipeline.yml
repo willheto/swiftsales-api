@@ -1,0 +1,45 @@
+name: Node.js CI and Deploy
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x] # Adjust as needed
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Checkout and pull changes from the dev branch
+        run: |
+          sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && git checkout dev && sudo git reset --hard && sudo git pull'
+
+      - name: Composer install
+        run: |
+          sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo composer install'
+
+      - name: Run phpstan
+        run: |
+          sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpstan analyse'
+
+      - name: Migrate and seed
+        run: |
+          sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo bash initialize_local_db.sh'
+
+      - name: Restart nginx
+        run: |
+          sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'sudo systemctl restart nginx'
+
+      - name: Make sure the uploads folder is owned by www-data
+        run: |
+          sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/'

@@ -53,16 +53,18 @@ Vagrant.configure("2") do |config|
     sudo mysql --user=root --execute="SET GLOBAL group_concat_max_len = 370000;"
     sudo service mysql restart
 
-    # Install guzzle and run composer install
+    # Composer install
     cd /var/www/swiftsales-api/
     composer install
-    composer require guzzlehttp/guzzle
 
     # Convert bash files to unix format, otherwise they will not run
     sudo dos2unix initialize_local_db.sh
 
     # Run migration and seed database
     sudo bash initialize_local_db.sh
+
+    # Add uploads folder
+    sudo mkdir /var/www/swiftsales-api/public/uploads/
 
     # Change permissions for uploads folder
     sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/

@@ -19,7 +19,7 @@ class File extends BaseModel implements AuthenticatableContract, AuthorizableCon
         'filePath',
     ];
 
-    public static function getValidationRules()
+    public static function getValidationRules(): array
     {
         return [
             'fileName' => ['string', 'required'],

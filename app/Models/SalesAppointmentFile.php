@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SalesAppointmentFile extends BaseModel implements AuthenticatableContract, AuthorizableContract
 {
@@ -20,7 +21,7 @@ class SalesAppointmentFile extends BaseModel implements AuthenticatableContract,
         'salesAppointmentID',
     ];
 
-    public static function getValidationRules()
+    public static function getValidationRules(): array
     {
         return [
             'fileID' => ['integer', 'required'],
@@ -28,12 +29,12 @@ class SalesAppointmentFile extends BaseModel implements AuthenticatableContract,
         ];
     }
 
-    public function file()
+    public function file(): BelongsTo
     {
         return $this->belongsTo(File::class, 'fileID', 'fileID');
     }
 
-    public function salesAppointment()
+    public function salesAppointment(): BelongsTo
     {
         return $this->belongsTo(SalesAppointment::class, 'salesAppointmentID', 'salesAppointmentID');
     }

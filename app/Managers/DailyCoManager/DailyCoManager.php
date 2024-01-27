@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 class DailyCoManager
 {
 
-    public function createMeetingUrl(int $expiryInHours)
+    public function createMeetingUrl(int $expiryInHours): array
     {
         $token = env('DAILY_CO_API_KEY');
         $expiryInSeconds = time() + 60 * 60 * $expiryInHours;
@@ -27,7 +27,7 @@ class DailyCoManager
         return $meeting;
     }
 
-    protected function secondsToMariaDBDate($seconds)
+    protected function secondsToMariaDBDate(int $seconds): string
     {
         $mysqlDateFormat = date('Y-m-d H:i:s', $seconds);
         $mariaDBDateObject = $mysqlDateFormat;

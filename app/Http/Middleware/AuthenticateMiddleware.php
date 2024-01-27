@@ -10,7 +10,7 @@ use Firebase\JWT\Key;
 
 class AuthenticateMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         try {
             $token = $request->header('Authorization');
@@ -23,7 +23,7 @@ class AuthenticateMiddleware
             $jwt = str_replace('Bearer ', '', $token);
 
             $decoded = JWT::decode($jwt, new Key(env('JWT_SECRET'), 'HS256'));
-            if (!$decoded || !$decoded->userID) {
+            if ($decoded->userID === false) {
                 throw new Exception('Unauthorized', 401);
             }
             $request->merge(['userID' => $decoded->userID]); // Attach userID to the request

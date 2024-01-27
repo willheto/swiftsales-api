@@ -3,14 +3,19 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 
 class CorsMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         // Intercepts OPTIONS requests
         if ($request->isMethod('OPTIONS')) {
             $allowedOrigin = $request->header('Origin');
+
+            if(!$allowedOrigin) {
+                return $next($request);
+            }
 
             return response()
                 ->json([], 204)

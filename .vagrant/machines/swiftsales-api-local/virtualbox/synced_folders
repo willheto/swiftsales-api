@@ -1,1 +1,1 @@
-{"virtualbox":{"/var/www/swiftsales-api":{"guestpath":"/var/www/swiftsales-api","hostpath":"D:/development/swiftsales/swiftsales-api","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/var/www/swiftsales-api":{"guestpath":"/var/www/swiftsales-api","hostpath":"C:/swiftsales/swiftsales-api","disabled":false,"__vagrantfile":true}}}

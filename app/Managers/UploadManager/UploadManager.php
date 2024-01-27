@@ -7,14 +7,18 @@ use App\Models\File;
 class UploadManager
 {
 
-    public function handleuploadFile($base64File, $fileName)
+    public function handleUploadFile(string $base64File, string $fileName): File
     {
         $fileType = mime_content_type($base64File);
+        if (!$fileType) {
+            throw new \Exception('Invalid base64 file');
+        }
+
         $this->checkIfFileTypeIsValid($fileType);
 
         $fileData = $this->decodeBase64File($base64File);
         $this->saveFile($fileData, $fileName);
-        
+
         $fileUrl = url('uploads/' . $fileName);
         // Create a new File record
         $file = File::create([
@@ -25,13 +29,14 @@ class UploadManager
         return $file;
     }
 
-    protected function saveFile($fileData, $fileName)
+    protected function saveFile(string $fileData, string $fileName): void
     {
+        # @phpstan-ignore-next-line
         $filePath = app()->basePath('public') . '/uploads/' . $fileName;
         file_put_contents($filePath, $fileData);
     }
 
-    protected function decodeBase64File($base64File): string
+    protected function decodeBase64File(string $base64File): string
     {
         $base64data = explode(',', $base64File, 2)[1];
         $fileData = base64_decode($base64data);
@@ -39,7 +44,7 @@ class UploadManager
         return $fileData;
     }
 
-    protected function checkIfFileTypeIsValid($fileType)
+    protected function checkIfFileTypeIsValid(string $fileType): void
     {
         $allowedMimeTypes = [
             'image/jpeg',

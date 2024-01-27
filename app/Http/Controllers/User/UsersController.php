@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Exceptions\CustomValidationException\CustomValidationException;
 use App\Exceptions\NotFoundException\NotFoundException;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -19,10 +20,10 @@ class UsersController extends BaseController
         $this->CRUD_RESPONSE_OBJECT = 'user';
     }
 
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         try {
-            $userID = $request->userID;
+            $userID = $request->json('userID');
             $user = User::where('userID', $userID)->with('organization')->first();
             if (!$user) {
                 throw new NotFoundException('User not found');
@@ -31,7 +32,8 @@ class UsersController extends BaseController
             $userIDInUser = $user->userID;
             $this->verifyAccessToResource($userIDInUser, $request);
             $user->update($request->except('userID'));
-            return $this->createResponseData($user, 'object');
+            $response = $this->createResponseData($user, 'object');
+            return response()->json($response);
         } catch (ValidationException $e) {
             return $this->handleError(new CustomValidationException);
         } catch (Exception $e) {

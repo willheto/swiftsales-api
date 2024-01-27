@@ -10,6 +10,7 @@ use App\Exceptions\NotFoundException\NotFoundException;
 use App\Exceptions\CustomValidationException\CustomValidationException;
 use Illuminate\Validation\ValidationException;
 use App\Managers\ImportManager\ImportManager;
+use Illuminate\Http\JsonResponse;
 
 class LeadsController extends BaseController
 {
@@ -19,18 +20,19 @@ class LeadsController extends BaseController
         $this->CRUD_RESPONSE_OBJECT = 'lead';
     }
 
-    public function getAllByUserID($userID, Request $request)
+    public function getAllByUserID(int $userID, Request $request): JsonResponse
     {
         try {
             $this->verifyAccessToResource($userID, $request);
             $leads = Lead::where('userID', $userID)->get();
-            return $this->createResponseData($leads, 'array');
+            $response = $this->createResponseData($leads, 'array');
+            return response()->json($response);
         } catch (Exception $e) {
             return $this->handleError($e);
         }
     }
 
-    public function getSingle($userID, $leadID, Request $request)
+    public function getSingle(int $userID, int $leadID, Request $request): JsonResponse
     {
         try {
             $this->verifyAccessToResource($userID, $request);
@@ -38,18 +40,20 @@ class LeadsController extends BaseController
             if (!$lead) {
                 throw new NotFoundException('Lead not found');
             }
-            return $this->createResponseData($lead, 'object');
+            $response = $this->createResponseData($lead, 'object');
+            return response()->json($response);
         } catch (Exception $e) {
             return $this->handleError($e);
         }
     }
 
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         try {
             $this->validate($request, Lead::getValidationRules());
             $lead = Lead::create($request->all());
-            return $this->createResponseData($lead, 'object');
+            $response = $this->createResponseData($lead, 'object');
+            return response()->json($response);
         } catch (ValidationException $e) {
             return $this->handleError(new CustomValidationException);
         } catch (Exception $e) {
@@ -57,17 +61,17 @@ class LeadsController extends BaseController
         }
     }
 
-    public function createBatch(Request $request)
+    public function createBatch(Request $request): JsonResponse
     {
         try {
-            $leadsArray = $request->leads;
-            $userID = $request->userID;
-
+            $leadsArray = $request->json('leads');
+            $userID = $request->json('userID');
             $importManager = new ImportManager;
             $leads = $importManager->importLeads($leadsArray, $userID);
 
             Lead::insert($leads);
-            return $this->createResponseData($leads, 'array');
+            $response = $this->createResponseData($leads, 'array');
+            return response()->json($response);
         } catch (ValidationException $e) {
             return $this->handleError(new CustomValidationException);
         } catch (Exception $e) {
@@ -75,10 +79,10 @@ class LeadsController extends BaseController
         }
     }
 
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         try {
-            $leadID = $request->leadID;
+            $leadID = $request->json('leadID');
             $lead = Lead::where('leadID', $leadID)->first();
             if (!$lead) {
                 throw new NotFoundException('Lead not found', 404);
@@ -88,7 +92,8 @@ class LeadsController extends BaseController
             $this->verifyAccessToResource($userIDInLead, $request);
 
             $lead->update($request->except('userID'));
-            return $this->createResponseData($lead, 'object');
+            $response = $this->createResponseData($lead, 'object');
+            return response()->json($response);
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->validator->errors()], 400);
         } catch (Exception $e) {
@@ -96,14 +101,14 @@ class LeadsController extends BaseController
         }
     }
 
-    public function deleteSingle(Request $request)
+    public function deleteSingle(Request $request): JsonResponse
     {
         try {
-            if (!$request->leadID) {
+            if (!$request->json('leadID')) {
                 throw new CustomValidationException('Lead ID is required');
             }
 
-            $leadID = $request->leadID;
+            $leadID = $request->json('leadID');
             $lead = Lead::where('leadID', $leadID)->first();
             if (!$lead) {
                 throw new NotFoundException('Lead not found', 404);
