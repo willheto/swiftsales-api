@@ -43,3 +43,11 @@ jobs:
       - name: Make sure the uploads folder is owned by www-data
         run: |
           sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/'
+
+      - name: Notify on success
+        if: success()
+        uses: appleboy/telegram-action@v0.1.0
+        with:
+          to: -1004138205814
+          token: 6949787786:AAHm2XxKc9lb-IPvgHcPI3uxJBZ2XE0SHGM
+          message: "Node.js CI/CD pipeline succeeded on branch dev. 🚀"
