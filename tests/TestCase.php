@@ -5,8 +5,7 @@ namespace Tests;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Managers\AuthManager\AuthManager;
 use App\Models\Organization;
 
 abstract class TestCase extends BaseTestCase
@@ -14,7 +13,6 @@ abstract class TestCase extends BaseTestCase
     protected static $dbInitialized = false;
     protected static $dbSeeded = false;
     protected static $clearDb = false;
-    protected static $testAccount;
     protected static $testUser;
 
     /**
@@ -24,6 +22,7 @@ abstract class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
+        putenv('APP_ENV=testing');
         return require __DIR__ . '/../bootstrap/app.php';
     }
 
@@ -35,18 +34,32 @@ abstract class TestCase extends BaseTestCase
             exit('Wrong environment, should be testing. Current environment is ' . env('APP_ENV'));
         }
 
+        if (!self::$dbInitialized) {
+            self::$dbInitialized = true;
+            $this->initDatabase();
+        }
 
-        $this->initDatabase();
-        $this->seedDatabase();
+        if (!self::$dbSeeded) {
+            self::$dbSeeded = true;
+            $this->seedDatabase();
+        }
     }
 
     protected static function getTestUser(): User
     {
         if (empty(self::$testUser)) {
-            $testUserEmail = 'bob.swift@swiftsals.fi';
+            $testUserEmail = 'bob.swift@swiftsales.fi';
             self::$testUser = User::where('email', $testUserEmail)->first();
         }
         return self::$testUser;
+    }
+
+    protected function createAuthorizationHeaders(User $user): array
+    {
+        $authManager = new AuthManager();
+        $jwt = $authManager->createUserJwt($user->userID);
+        $headers = ['Authorization' => 'Bearer ' . $jwt];
+        return $headers;
     }
 
     private static function initDatabase(): void

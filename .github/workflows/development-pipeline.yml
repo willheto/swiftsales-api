@@ -59,4 +59,4 @@ jobs:
         with:
           to: -4099101573
           token: 6949787786:AAHm2XxKc9lb-IPvgHcPI3uxJBZ2XE0SHGM
-          message: "Swiftsales development api päivitetty. \nTehdyt muutokset: ${{ steps.commit_message.outputs.message }}"
+          message: "Swiftsales development api päivitetty. \n\nTehdyt muutokset: ${{ steps.commit_message.outputs.message }}"

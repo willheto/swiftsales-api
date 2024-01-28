@@ -114,7 +114,7 @@ class SalesAppointmentsController extends BaseController
 
             DB::commit();
             $response =  $this->createResponseData($salesAppointment, 'object');
-            return response()->json($response);
+            return response()->json($response, 201);
         } catch (Exception $e) {
             return $this->handleError($e);
         }

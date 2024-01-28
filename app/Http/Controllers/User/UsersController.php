@@ -25,12 +25,14 @@ class UsersController extends BaseController
         try {
             $userID = $request->json('userID');
             $user = User::where('userID', $userID)->with('organization')->first();
+
             if (!$user) {
                 throw new NotFoundException('User not found');
             }
 
             $userIDInUser = $user->userID;
             $this->verifyAccessToResource($userIDInUser, $request);
+
             $user->update($request->except('userID'));
             $response = $this->createResponseData($user, 'object');
             return response()->json($response);

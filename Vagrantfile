@@ -53,7 +53,8 @@ Vagrant.configure("2") do |config|
     sudo mysql --user=root --execute="SET GLOBAL group_concat_max_len = 370000;"
     sudo service mysql restart
 
-    # Add user for testing database
+    # Create testing database and user
+    CREATE DATABASE swiftsalesTesting;
     sudo mysql --user=root --execute="CREATE USER 'swiftsalesTestUser'@'localhost' IDENTIFIED BY 'test'; GRANT ALL PRIVILEGES ON *.* TO 'swiftsalesTestUser'@'localhost' WITH GRANT OPTION;"
     sudo mysql --user=root --execute="SET GLOBAL group_concat_max_len = 370000;"
 

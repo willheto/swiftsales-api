@@ -12,6 +12,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use App\Managers\AuthManager\AuthManager;
 
 class UserAuthController extends BaseController
 {
@@ -50,14 +51,9 @@ class UserAuthController extends BaseController
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
 
-            $payload = [
-                'iss' => "swiftsales-api",
-                'iat' => time(),
-                'exp' => time() + 60 * 60 * 10,
-                'userID' => $user->userID
-            ];
+            $authManager = new AuthManager();
+            $jwt = $authManager->createUserJwt($user->userID);
 
-            $jwt = JWT::encode($payload, env('JWT_SECRET'), 'HS256');
             $response = [
                 'user' => $user->toArray(),
                 'token' => $jwt

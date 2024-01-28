@@ -35,8 +35,6 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
     protected $fillable = [
         'userID',
         'leadID',
-        'timeStart',
-        'timeEnd',
         'notes',
         'meetingUrl',
         'meetingExpiryTime',

@@ -3,9 +3,8 @@
 namespace Tests\Controllers;
 
 use Tests\TestCase;
-use App\Models\User;
 
-class userAuthControllerTest extends TestCase
+class UserAuthControllerTest extends TestCase
 {
 
     public function testSuccessfulLogin(): void

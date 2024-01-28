@@ -53,7 +53,7 @@ class LeadsController extends BaseController
             $this->validate($request, Lead::getValidationRules());
             $lead = Lead::create($request->all());
             $response = $this->createResponseData($lead, 'object');
-            return response()->json($response);
+            return response()->json($response, 201);
         } catch (ValidationException $e) {
             return $this->handleError(new CustomValidationException);
         } catch (Exception $e) {
@@ -71,7 +71,7 @@ class LeadsController extends BaseController
 
             Lead::insert($leads);
             $response = $this->createResponseData($leads, 'array');
-            return response()->json($response);
+            return response()->json($response, 201);
         } catch (ValidationException $e) {
             return $this->handleError(new CustomValidationException);
         } catch (Exception $e) {
