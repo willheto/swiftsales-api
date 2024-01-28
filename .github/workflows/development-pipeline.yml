@@ -32,6 +32,10 @@ jobs:
         run: |
           sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpstan analyse'
 
+      - name: Run tests
+        run: |
+          sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpunit'
+
       - name: Migrate and seed
         run: |
           sshpass -p 'TA4bgvMmMokqrKLOM1je' ssh -o StrictHostKeyChecking=no root@146.190.56.16 'cd /var/www/swiftsales-api && sudo bash initialize_local_db.sh'

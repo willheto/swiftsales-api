@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Exceptions\CustomValidationException\CustomValidationException;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -10,6 +11,7 @@ use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 class UserAuthController extends BaseController
 {
@@ -62,6 +64,10 @@ class UserAuthController extends BaseController
             ];
 
             return response()->json($response);
+        } catch (ValidationException $e) {
+            $exceptionMessage = $e->getMessage();
+            $validationException = new CustomValidationException($exceptionMessage);
+            return $this->handleError($validationException);
         } catch (Exception $e) {
             return $this->handleError($e);
         }
