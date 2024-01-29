@@ -73,13 +73,8 @@ Vagrant.configure("2") do |config|
 
     # Change permissions for uploads folder
     sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/
+    
+    sudo systemctl restart nginx
 
   SHELL
-
-  config.vm.define "swiftsales-api-local" do |mt|
-		mt.trigger.after :up do |trigger|
-			trigger.info = "Running after-up..."
-			trigger.run_remote = {inline: "sudo bash /var/www/swiftsales-api/after-up.sh"}
-		end
-	end
 end

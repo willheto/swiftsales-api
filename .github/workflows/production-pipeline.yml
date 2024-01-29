@@ -1,0 +1,62 @@
+name: Node.js CI and Deploy
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x] # Adjust as needed
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Checkout and pull changes from the master branch
+        run: |
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && git checkout master && sudo git reset --hard && sudo git pull'
+
+      - name: Composer install
+        run: |
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo composer install'
+
+      - name: Run phpstan
+        run: |
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpstan analyse'
+
+      - name: Run tests
+        run: |
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpunit'
+
+      - name: Migrate
+        run: |
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo php artisan migrate'
+
+      - name: Restart nginx
+        run: |
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'sudo systemctl restart nginx'
+
+      - name: Make sure the uploads folder is owned by www-data
+        run: |
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/'
+
+      - name: Get commit message
+        id: commit_message
+        run: |
+          echo "::set-output name=message::$(git log -1 --pretty=format:%s)"
+
+      - name: Notify on success to Liput On telegram channel
+        if: success()
+        uses: appleboy/telegram-action@v0.1.0
+        with:
+          to: -4099101573
+          token: 6949787786:AAHm2XxKc9lb-IPvgHcPI3uxJBZ2XE0SHGM
+          message: "Swiftsales production api päivitetty. \n\nTehdyt muutokset: ${{ steps.commit_message.outputs.message }}"
