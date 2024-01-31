@@ -22,31 +22,31 @@ jobs:
 
       - name: Checkout and pull changes from the master branch
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && git checkout master && sudo git reset --hard && sudo git pull'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'cd /var/www/swiftsales-api && git checkout master && sudo git reset --hard && sudo git pull'
 
       - name: Composer install
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo composer install'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'cd /var/www/swiftsales-api && sudo composer install'
 
       - name: Run phpstan
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpstan analyse'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpstan analyse'
 
       - name: Run tests
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpunit'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'cd /var/www/swiftsales-api && sudo ./vendor/bin/phpunit'
 
       - name: Migrate
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'cd /var/www/swiftsales-api && sudo php artisan migrate'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'cd /var/www/swiftsales-api && sudo php artisan migrate'
 
       - name: Restart nginx
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'sudo systemctl restart nginx'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'sudo systemctl restart nginx'
 
       - name: Make sure the uploads folder is owned by www-data
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@64.226.99.88 'sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'sudo chown -R www-data:www-data /var/www/swiftsales-api/public/uploads/'
 
       - name: Get commit message
         id: commit_message
