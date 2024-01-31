@@ -38,7 +38,7 @@ jobs:
 
       - name: Migrate
         run: |
-          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'cd /var/www/swiftsales-api && sudo php artisan migrate'
+          sshpass -p 'oaisjd234jdij328f2foih0fn112dok139hjASs' ssh -o StrictHostKeyChecking=no root@24.199.121.127 'cd /var/www/swiftsales-api && sudo php artisan migrate --env=production'
 
       - name: Restart nginx
         run: |
