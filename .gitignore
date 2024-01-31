@@ -3,6 +3,5 @@
 .phpunit.result.cache
 ./public/uploads/*
 ./.vagrant
-./.env
-./.env.*
-./.env.production
+.env
+
