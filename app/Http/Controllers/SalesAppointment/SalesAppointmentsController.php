@@ -141,6 +141,15 @@ class SalesAppointmentsController extends BaseController
 
             if ($request->json('salesAppointmentFiles')) {
                 foreach ($request->json('salesAppointmentFiles') as $salesAppointmentFile) {
+
+                    if (isset($salesAppointmentFile['salesAppointmentFileID'])) {
+                        $salesAppointmentFileID = $salesAppointmentFile['salesAppointmentFileID'];
+                        if (isset($salesAppointmentFile['delete'])) {
+                            $this->removeSalesAppointmentFile($salesAppointmentFileID);
+                            continue;
+                        }
+                        continue;
+                    }
                     $base64File = $salesAppointmentFile['base64File'];
                     $fileName = $salesAppointmentFile['fileName'];
 
@@ -212,5 +221,14 @@ class SalesAppointmentsController extends BaseController
         } catch (Exception $e) {
             return $this->handleError($e);
         }
+    }
+
+    protected function removeSalesAppointmentFile(int $salesAppointmentFileID): void
+    {
+        $salesAppointmentFile = SalesAppointmentFile::where('salesAppointmentFileID', $salesAppointmentFileID)->first();
+        if (!$salesAppointmentFile) {
+            throw new NotFoundException('SalesAppointmentFile not found');
+        }
+        $salesAppointmentFile->delete();
     }
 }
