@@ -1,7 +1,7 @@
 /vendor
 /.idea
 .phpunit.result.cache
-./public/uploads/*
+public/uploads/*
 .vagrant/
 .env
 
