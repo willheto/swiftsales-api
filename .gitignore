@@ -2,6 +2,6 @@
 /.idea
 .phpunit.result.cache
 ./public/uploads/*
-./.vagrant
+.vagrant/
 .env
 
