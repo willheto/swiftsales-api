@@ -74,6 +74,8 @@ class init extends Migration
             $table->string('meetingUrl', 1000)->default('');
             $table->timestamp('meetingExpiryTime')->nullable();
             $table->boolean('isCustomerAllowedToShareFiles')->default(false);
+            $table->boolean('isSalesAppointmentSecuredWithPassword')->default(false);
+            $table->string('password', 100)->nullable();
             $table->timestamps();
 
             $table->foreign('userID')->references('userID')->on('users')->onDelete('cascade');

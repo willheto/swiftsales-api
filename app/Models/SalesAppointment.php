@@ -30,6 +30,7 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
         'isCustomerAllowedToShareFiles' => 'boolean',
+        'isSalesAppointmentSecuredWithPassword' => 'boolean'
     ];
 
     protected $fillable = [
@@ -38,7 +39,9 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
         'notes',
         'meetingUrl',
         'meetingExpiryTime',
-        'isCustomerAllowedToShareFiles'
+        'isCustomerAllowedToShareFiles',
+        'isSalesAppointmentSecuredWithPassword',
+        'password'
     ];
 
     protected SalesAppointmentFile $salesAppointmentFiles;
