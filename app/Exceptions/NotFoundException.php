@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\NotFoundException;
+namespace App\Exceptions;
 
 use Exception;
 

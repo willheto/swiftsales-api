@@ -19,11 +19,22 @@ class File extends BaseModel implements AuthenticatableContract, AuthorizableCon
         'filePath',
     ];
 
-    public static function getValidationRules(): array
+    public static function getValidationRules(array $fieldsToValidate): array
     {
-        return [
+        $validationRules =  [
             'fileName' => ['string', 'required'],
             'filePath' => ['string', 'required'],
         ];
+
+        if (
+            empty($fieldsToValidate)
+        ) {
+            return $validationRules;
+        }
+
+        // Filter the rules based on the posted fields
+        $filteredRules = array_intersect_key($validationRules, $fieldsToValidate);
+
+        return $filteredRules;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\CustomValidationException;
+namespace App\Exceptions;
 
 use Exception;
 

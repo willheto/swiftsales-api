@@ -38,13 +38,35 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
         'leadID',
         'notes',
         'meetingUrl',
-        'meetingExpiryTime',
         'isCustomerAllowedToShareFiles',
         'isSalesAppointmentSecuredWithPassword',
-        'password'
+        'password',
+        'timeStart',
+        'timeEnd'
     ];
 
     protected SalesAppointmentFile $salesAppointmentFiles;
+
+
+    public static function getValidationRules(array $fieldsToValidate): array
+    {
+        $validationRules =  [
+            'leadID' => ['required', 'integer', 'exists:leads,leadID'],
+            'timeStart' => ['required', 'string'],
+            'timeEnd' => ['required', 'string'],
+        ];
+
+        if (
+            empty($fieldsToValidate)
+        ) {
+            return $validationRules;
+        }
+
+        // Filter the rules based on the posted fields
+        $filteredRules = array_intersect_key($validationRules, $fieldsToValidate);
+
+        return $filteredRules;
+    }
 
     public function user(): BelongsTo
     {

@@ -14,8 +14,7 @@ class UsersControllerTest extends TestCase
             'lastName' => 'Swift changed',
             'email' => 'bob.swift.changed@swiftsales.fi',
             'timeZone' => 'Europe/Stocholm',
-            'userType' => 'admin',
-            'password' => password_hash('test22', PASSWORD_BCRYPT)
+            'password' => 'test'
         ];
 
         $headers = $this->createAuthorizationHeaders($user);
@@ -27,7 +26,6 @@ class UsersControllerTest extends TestCase
                 'lastName' => $postData['lastName'],
                 'email' => $postData['email'],
                 'timeZone' => $postData['timeZone'],
-                'userType' => $postData['userType'],
             ]);
     }
 

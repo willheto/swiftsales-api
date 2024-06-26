@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\SalesAppointment;
 
 class SalesAppointmentsSeeder extends Seeder
 {
@@ -14,6 +13,6 @@ class SalesAppointmentsSeeder extends Seeder
      */
     public function run()
     {
-        SalesAppointment::factory()->count(100)->create();
+        
     }
 }

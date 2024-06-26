@@ -4,8 +4,8 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 use App\Models\User;
-use App\Exceptions\CustomValidationException\CustomValidationException;
-use App\Exceptions\NotFoundException\NotFoundException;
+use App\Exceptions\CustomValidationException;
+use App\Exceptions\NotFoundException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,6 +23,8 @@ class UsersController extends BaseController
     public function update(Request $request): JsonResponse
     {
         try {
+            $this->validate($request, User::getValidationRules($request->json()->all()));
+
             $userID = $request->json('userID');
             $user = User::where('userID', $userID)->with('organization')->first();
 
@@ -30,10 +32,8 @@ class UsersController extends BaseController
                 throw new NotFoundException('User not found');
             }
 
-            $userIDInUser = $user->userID;
-            $this->verifyAccessToResource($userIDInUser, $request);
+            $user->update($user->getFillableUserDataFromRequest($request));
 
-            $user->update($request->except('userID'));
             $response = $this->createResponseData($user, 'object');
             return response()->json($response);
         } catch (ValidationException $e) {
@@ -41,5 +41,10 @@ class UsersController extends BaseController
         } catch (Exception $e) {
             return $this->handleError($e);
         }
+    }
+
+    public function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_BCRYPT);
     }
 }

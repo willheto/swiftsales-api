@@ -5,7 +5,7 @@ namespace Tests;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
-use App\Managers\AuthManager\AuthManager;
+use App\Managers\AuthManager;
 use App\Models\Organization;
 
 abstract class TestCase extends BaseTestCase

@@ -40,7 +40,7 @@ class ImportManager
 
     protected function validateLead(array $lead): bool
     {
-        $validationRules = Lead::getValidationRules();
+        $validationRules = Lead::getValidationRules([]);
         $validator = Validator::make($lead, $validationRules);
         if ($validator->fails()) {
             return false;

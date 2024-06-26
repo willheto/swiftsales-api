@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\Request;
 
 class User extends BaseModel implements AuthenticatableContract, AuthorizableContract
 {
@@ -27,9 +28,9 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
 
     protected $hidden = ['password'];
 
-    public function getValidationRules(): array
+    public static function getValidationRules(array $fieldsToValidate): array
     {
-        return [
+        $validationRules =  [
             'firstName' => ['string', 'required'],
             'lastName' => ['string', 'required'],
             'email' => ['email', 'required', 'unique:users'],
@@ -38,7 +39,33 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
             'organization' => ['string', 'nullable'],
             'password' => ['string', 'required', 'min:8']
         ];
+
+        if (
+            empty($fieldsToValidate)
+        ) {
+            return $validationRules;
+        }
+
+        // Filter the rules based on the posted fields
+        $filteredRules = array_intersect_key($validationRules, $fieldsToValidate);
+
+        return $filteredRules;
     }
+
+    public function getFillableUserDataFromRequest(Request $request): array
+    {
+        if (isset($request->password)) {
+            $request['password'] = $this->hashPassword($request['password']);
+        }
+
+        return $request->except('userID', 'userType', 'organizationID');
+    }
+
+    public function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_BCRYPT);
+    }
+
 
     public function leads(): HasMany
     {

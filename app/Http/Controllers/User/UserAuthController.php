@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Exceptions\CustomValidationException\CustomValidationException;
+use App\Exceptions\CustomValidationException;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -12,7 +12,10 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
-use App\Managers\AuthManager\AuthManager;
+use App\Managers\AuthManager;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\BadRequestException;
+
 
 class UserAuthController extends BaseController
 {
@@ -64,6 +67,29 @@ class UserAuthController extends BaseController
             $exceptionMessage = $e->getMessage();
             $validationException = new CustomValidationException($exceptionMessage);
             return $this->handleError($validationException);
+        } catch (Exception $e) {
+            return $this->handleError($e);
+        }
+    }
+
+    public function checkPassword(Request $request): JsonResponse
+    {
+        try {
+            $userID = $request->json('userID');
+            $this->verifyAccessToResource($userID, $request);
+
+            $password = $request->json('password');
+            $user = User::where('userID', $userID)->first();
+
+            if (!$user) {
+                throw new NotFoundException('User not found');
+            }
+
+            if (!password_verify($password, $user->password)) {
+                throw new BadRequestException('Password is incorrect', 400);
+            }
+
+            return response()->json(['isValid' => true]);
         } catch (Exception $e) {
             return $this->handleError($e);
         }

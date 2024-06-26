@@ -32,9 +32,9 @@ class Lead extends BaseModel implements AuthenticatableContract, AuthorizableCon
         'description'
     ];
 
-    public static function getValidationRules(): array
+    public static function getValidationRules(array $fieldsToValidate): array
     {
-        return [
+        $validationRules =  [
             'businessID' => ['string'],
             'companyName' => ['string', 'required'],
             'contactPerson' => ['string'],
@@ -43,7 +43,19 @@ class Lead extends BaseModel implements AuthenticatableContract, AuthorizableCon
             'header' => ['string'],
             'description' => ['string']
         ];
+
+        if (
+            empty($fieldsToValidate)
+        ) {
+            return $validationRules;
+        }
+
+        // Filter the rules based on the posted fields
+        $filteredRules = array_intersect_key($validationRules, $fieldsToValidate);
+
+        return $filteredRules;
     }
+
 
     public function user(): BelongsTo
     {

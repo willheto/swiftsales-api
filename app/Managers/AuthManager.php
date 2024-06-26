@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Managers\AuthManager;
+namespace App\Managers;
 
 use App\Exceptions\UnauthorizedException\UnauthorizedException;
 use Illuminate\Http\Request;

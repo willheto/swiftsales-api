@@ -15,7 +15,7 @@ class SalesAppointmentsTest extends TestCase
             ->seeStatusCode(200);
     }
 
-    public function testCreateSalesAppointment(): void
+    public function testCreateSalesAppointmentWithoutTimeStartOrTimeEndShouldFail(): void
     {
         $user = $this->getTestUser();
         $headers = $this->createAuthorizationHeaders($user);
@@ -35,10 +35,33 @@ class SalesAppointmentsTest extends TestCase
         ];
 
         $this->json('POST', 'sales-appointments/', $postData, $headers)
-            ->seeStatusCode(201)
-            ->seeJsonStructure([
-                'salesAppointment'
-            ]);
+            ->seeStatusCode(400);
+    }
+
+    public function testCreateSalesAppointment(): void
+    {
+        $user = $this->getTestUser();
+        $headers = $this->createAuthorizationHeaders($user);
+
+        $lead = Lead::create(
+            [
+                'userID' => $user->userID,
+                'companyName' => 'Test company',
+            ]
+        );
+
+        $postData = [
+            'userID' => $user->userID,
+            'leadID' => $lead->leadID,
+            'notes' => 'Test notes',
+            'isCustomerAllowedToShareFiles' => true,
+            'timeStart' => '2021-01-01 12:00:00',
+            // now + 1 hour
+            'timeEnd' => date('Y-m-d H:i:s', strtotime('+1 hour')),
+        ];
+
+        $this->json('POST', 'sales-appointments/', $postData, $headers)
+            ->seeStatusCode(201);
     }
 
     public function testGetSingleSalesAppointment(): void
@@ -83,18 +106,6 @@ class SalesAppointmentsTest extends TestCase
             ]);
     }
 
-
-    public function testRenewMeetingUrl(): void
-    {
-        $user = $this->getTestUser();
-        $headers = $this->createAuthorizationHeaders($user);
-
-        $this->json('POST', 'sales-appointments/' . 1 . '/renew-meeting-url', [], $headers)
-            ->seeStatusCode(200)
-            ->seeJsonStructure([
-                'salesAppointment'
-            ]);
-    }
 
     public function testDeleteSalesAppointment(): void
     {

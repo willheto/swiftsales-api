@@ -1,5 +1,8 @@
 <?php
 
+use Monolog\Handler\FilterHandler;
+use Monolog\Handler\TelegramBotHandler;
+
 return [
 
     /*
@@ -42,7 +45,15 @@ return [
             'days' => 14, // Number of days to keep log files
         ],
 
-        // ... Other log channels can be configured here
+        'telegram' => [
+            'driver'  => 'monolog',
+            'handler' => FilterHandler::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+            'with' => [
+                'handler' => new TelegramBotHandler($apiKey = env('TELEGRAM_API_KEY'), $channel = env('TELEGRAM_CHANNEL'))
+
+            ]
+        ]
 
     ],
 

@@ -21,12 +21,24 @@ class SalesAppointmentFile extends BaseModel implements AuthenticatableContract,
         'salesAppointmentID',
     ];
 
-    public static function getValidationRules(): array
+    public static function getValidationRules(array $fieldsToValidate): array
     {
-        return [
+        $validationRules =  [
             'fileID' => ['integer', 'required'],
             'salesAppointmentID' => ['integer', 'required'],
         ];
+
+
+        if (
+            empty($fieldsToValidate)
+        ) {
+            return $validationRules;
+        }
+
+        // Filter the rules based on the posted fields
+        $filteredRules = array_intersect_key($validationRules, $fieldsToValidate);
+
+        return $filteredRules;
     }
 
     public function file(): BelongsTo

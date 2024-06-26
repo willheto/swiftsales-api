@@ -26,6 +26,7 @@ $router->get('sales-appointments/{salesAppointmentID}', 'SalesAppointment\SalesA
 // These endpoints require user authentication
 $router->group(['middleware' => App\Http\Middleware\AuthenticateMiddleware::class], function ($router) {
     $router->patch('users', 'User\UsersController@update');
+    $router->post('users/check-password', 'User\UserAuthController@checkPassword');
 
     $router->get('users/{userID}/leads', 'Lead\LeadsController@getAllByUserID');
     $router->get('users/{userID}/leads/{leadID}', 'Lead\LeadsController@getSingle');

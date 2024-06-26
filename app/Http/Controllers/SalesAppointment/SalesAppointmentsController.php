@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\SalesAppointment;
 
-use App\Exceptions\CustomValidationException\CustomValidationException;
-use App\Exceptions\NotFoundException\NotFoundException;
+use App\Exceptions\CustomValidationException;
+use App\Exceptions\NotFoundException;
 use App\Http\Controllers\BaseController;
 use App\Models\SalesAppointment;
 use App\Models\SalesAppointmentFile;
@@ -16,6 +16,7 @@ use App\Managers\UploadManager\UploadManager;
 use App\Managers\DailyCoManager\DailyCoManager;
 use App\Models\Lead;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class SalesAppointmentsController extends BaseController
 {
@@ -78,10 +79,10 @@ class SalesAppointmentsController extends BaseController
     public function create(Request $request): JsonResponse
     {
         try {
-            if (!$request->json('leadID')) {
-                throw new CustomValidationException('Lead ID is required');
-            }
+            $this->validate($request, SalesAppointment::getValidationRules([]));
+
             $lead = Lead::where('leadID', $request->json('leadID'))->first();
+
             if (!$lead) {
                 throw new NotFoundException('Lead not found');
             }
@@ -92,10 +93,12 @@ class SalesAppointmentsController extends BaseController
             DB::beginTransaction();
 
             $dailyCoManager = new DailyCoManager();
-            $meetingUrl = $dailyCoManager->createMeetingUrl(24);
+            $timeStart = $request->json('timeStart');
+            $timeEnd = $request->json('timeEnd');
+            $meeting = $dailyCoManager->createMeetingUrl($timeStart, $timeEnd);
+
             $salesAppointmentToSave = $request->all();
-            $salesAppointmentToSave['meetingUrl'] = $meetingUrl['url'];
-            $salesAppointmentToSave['meetingExpiryTime'] = $meetingUrl['expiryTime'];
+            $salesAppointmentToSave['meetingUrl'] = $meeting['url'];
             $salesAppointment = SalesAppointment::create($salesAppointmentToSave);
 
             if ($request->json('salesAppointmentFiles')) {
@@ -115,7 +118,10 @@ class SalesAppointmentsController extends BaseController
             DB::commit();
             $response =  $this->createResponseData($salesAppointment, 'object');
             return response()->json($response, 201);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => $e->validator->errors()], 400);
         } catch (Exception $e) {
+            Log::error($e);
             return $this->handleError($e);
         }
     }
@@ -123,9 +129,7 @@ class SalesAppointmentsController extends BaseController
     public function update(Request $request): JsonResponse
     {
         try {
-            if (!$request->json('salesAppointmentID')) {
-                throw new CustomValidationException('SalesAppointment ID is required');
-            }
+            $this->validate($request, SalesAppointment::getValidationRules(request()->json()->all()));
 
             $salesAppointmentID = $request->json('salesAppointmentID');
             $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->first();
@@ -137,6 +141,11 @@ class SalesAppointmentsController extends BaseController
             $this->verifyAccessToResource($salesAppointment->userID, $request);
 
             DB::beginTransaction();
+            $dailyCoManager = new DailyCoManager();
+            $newTimeStart = $request->json('timeStart');
+            $newTimeEnd = $request->json('timeEnd');
+
+            $dailyCoManager->updateMeetingTime($salesAppointment->meetingUrl, $newTimeStart ?? $salesAppointment->timeStart, $newTimeEnd ?? $salesAppointment->timeEnd);
             $salesAppointment->update($request->except('userID'));
 
             if ($request->json('salesAppointmentFiles')) {
@@ -175,10 +184,6 @@ class SalesAppointmentsController extends BaseController
     public function deleteSingle(Request $request): JsonResponse
     {
         try {
-            if (!$request->json('salesAppointmentID')) {
-                throw new CustomValidationException('SalesAppointment ID is required');
-            }
-
             $salesAppointmentID = $request->json('salesAppointmentID');
             $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->first();
             if (!$salesAppointment) {
@@ -189,35 +194,6 @@ class SalesAppointmentsController extends BaseController
             $this->verifyAccessToResource($userIDInSalesAppointment, $request);
             $salesAppointment->delete();
             return response()->json(['success' => 'SalesAppointment deleted'], 200);
-        } catch (Exception $e) {
-            return $this->handleError($e);
-        }
-    }
-
-    public function renewMeetingUrl(int $salesAppointmentID, Request $request): JsonResponse
-    {
-        try {
-            if (!$salesAppointmentID) {
-                throw new CustomValidationException('SalesAppointment ID is required');
-            }
-
-            $salesAppointment = SalesAppointment::where('salesAppointmentID', $salesAppointmentID)->first();
-            if (!$salesAppointment) {
-                throw new NotFoundException('SalesAppointment not found');
-            }
-
-            $userIDInSalesAppointment = $salesAppointment->userID;
-            $this->verifyAccessToResource($userIDInSalesAppointment, $request);
-
-            $dailyCoManager = new DailyCoManager();
-            $meetingUrl = $dailyCoManager->createMeetingUrl(24);
-            $salesAppointment->update([
-                'meetingUrl' => $meetingUrl['url'],
-                'meetingExpiryTime' => $meetingUrl['expiryTime']
-            ]);
-
-            $response = $this->createResponseData($salesAppointment, 'object');
-            return response()->json($response);
         } catch (Exception $e) {
             return $this->handleError($e);
         }

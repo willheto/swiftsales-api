@@ -6,8 +6,8 @@ use App\Http\Controllers\BaseController;
 use App\Models\Lead;
 use Exception;
 use Illuminate\Http\Request;
-use App\Exceptions\NotFoundException\NotFoundException;
-use App\Exceptions\CustomValidationException\CustomValidationException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\CustomValidationException;
 use Illuminate\Validation\ValidationException;
 use App\Managers\ImportManager\ImportManager;
 use Illuminate\Http\JsonResponse;
@@ -50,7 +50,7 @@ class LeadsController extends BaseController
     public function create(Request $request): JsonResponse
     {
         try {
-            $this->validate($request, Lead::getValidationRules());
+            $this->validate($request, Lead::getValidationRules([]));
             $lead = Lead::create($request->all());
             $response = $this->createResponseData($lead, 'object');
             return response()->json($response, 201);
@@ -104,10 +104,6 @@ class LeadsController extends BaseController
     public function deleteSingle(Request $request): JsonResponse
     {
         try {
-            if (!$request->json('leadID')) {
-                throw new CustomValidationException('Lead ID is required');
-            }
-
             $leadID = $request->json('leadID');
             $lead = Lead::where('leadID', $leadID)->first();
             if (!$lead) {

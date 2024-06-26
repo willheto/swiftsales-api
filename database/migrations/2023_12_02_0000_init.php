@@ -72,10 +72,11 @@ class init extends Migration
             $table->unsignedInteger('leadID');
             $table->string('notes', 1000)->default('');
             $table->string('meetingUrl', 1000)->default('');
-            $table->timestamp('meetingExpiryTime')->nullable();
             $table->boolean('isCustomerAllowedToShareFiles')->default(false);
             $table->boolean('isSalesAppointmentSecuredWithPassword')->default(false);
             $table->string('password', 100)->nullable();
+            $table->string('timeStart', 100)->default('');
+            $table->string('timeEnd', 100)->default('');
             $table->timestamps();
 
             $table->foreign('userID')->references('userID')->on('users')->onDelete('cascade');
