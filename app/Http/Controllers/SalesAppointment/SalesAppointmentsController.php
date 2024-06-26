@@ -121,7 +121,6 @@ class SalesAppointmentsController extends BaseController
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->validator->errors()], 400);
         } catch (Exception $e) {
-            Log::error($e);
             return $this->handleError($e);
         }
     }

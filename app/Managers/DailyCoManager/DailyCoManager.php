@@ -45,8 +45,6 @@ class DailyCoManager
         //parse meeting id from the meeting url
         $meetingID = explode('/', $meetingUrl)[3];
 
-        Log::error('https://api.daily.co/v1/rooms/' . $meetingID);
-
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Content-Type' => 'application/json',
