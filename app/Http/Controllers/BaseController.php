@@ -52,7 +52,13 @@ class BaseController extends Controller
             return response()->json(['error' => 'Invalid token'], 401);
         }
 
-        $statusCode = ($e->getCode() ? $e->getCode() : 500);
+        // Check for invalid HTTP status code error
+        if (str_contains($e->getMessage(), 'The HTTP status code')) {
+            return response()->json(['error' => 'Invalid HTTP status code'], 500);
+        }
+
+        // Validate the status code, default to 500 if invalid
+        $statusCode = ($e->getCode() && $this->isValidHttpStatusCode($e->getCode())) ? $e->getCode() : 500;
 
         if ($this->isErrorSuspicous($statusCode)) {
             $this->logSuspiciousActivityToTelegram($e);
@@ -60,6 +66,18 @@ class BaseController extends Controller
 
         return response()->json(['error' => $e->getMessage()], $statusCode);
     }
+
+    /**
+     * Validates if a given status code is within the valid HTTP status code range.
+     *
+     * @param int $statusCode
+     * @return bool
+     */
+    private function isValidHttpStatusCode($statusCode): bool
+    {
+        return is_numeric($statusCode) && $statusCode >= 100 && $statusCode <= 599;
+    }
+
 
     protected function logSuspiciousActivityToTelegram(Exception $exception): void
     {

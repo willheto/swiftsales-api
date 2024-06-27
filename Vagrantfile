@@ -20,6 +20,10 @@ Vagrant.configure("2") do |config|
   end
   
   config.vm.provision "shell", inline: <<-SHELL
+
+    echo "cd /var/www/swiftsales-api" >> /root/.bashrc
+    echo "cd /var/www/swiftsales-api" >> /home/vagrant/.bashrc
+
     # Basic updates and package installations
     sudo apt-get update
     sudo apt-get install -y php php-cli php-mbstring php-xml composer git net-tools supervisor dos2unix

@@ -65,8 +65,7 @@ class LeadsControllerTest extends TestCase
                     'contactPerson' => 'Test person',
                     'contactPhone' => '123456789',
                     'contactEmail' => 'test@gmail.com',
-                    'header' => 'Test header',
-                    'description' => 'Test description'
+                    'notes' => "test"
                 ],
                 [
                     'userID' => $user->userID,
@@ -75,8 +74,7 @@ class LeadsControllerTest extends TestCase
                     'contactPerson' => 'Test person',
                     'contactPhone' => '123456789',
                     'contactEmail' => 'test@gmail.com',
-                    'header' => 'Test header',
-                    'description' => 'Test description'
+                    'notes' => 'notes test'
                 ]
             ]
         ];

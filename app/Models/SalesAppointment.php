@@ -54,6 +54,7 @@ class SalesAppointment extends BaseModel implements AuthenticatableContract, Aut
             'leadID' => ['required', 'integer', 'exists:leads,leadID'],
             'timeStart' => ['required', 'string'],
             'timeEnd' => ['required', 'string'],
+            'notes' => ['string', 'max:1000'],
         ];
 
         if (
