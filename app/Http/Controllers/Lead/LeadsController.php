@@ -11,6 +11,7 @@ use App\Exceptions\CustomValidationException;
 use Illuminate\Validation\ValidationException;
 use App\Managers\ImportManager\ImportManager;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class LeadsController extends BaseController
 {
@@ -55,7 +56,7 @@ class LeadsController extends BaseController
             $response = $this->createResponseData($lead, 'object');
             return response()->json($response, 201);
         } catch (ValidationException $e) {
-            return $this->handleError(new CustomValidationException);
+            return $this->handleError(new CustomValidationException($e->getMessage()));
         } catch (Exception $e) {
             return $this->handleError($e);
         }
@@ -73,7 +74,7 @@ class LeadsController extends BaseController
             $response = $this->createResponseData($leads, 'array');
             return response()->json($response, 201);
         } catch (ValidationException $e) {
-            return $this->handleError(new CustomValidationException);
+            return $this->handleError(new CustomValidationException($e->getMessage()));
         } catch (Exception $e) {
             return $this->handleError($e);
         }
@@ -82,12 +83,14 @@ class LeadsController extends BaseController
     public function update(Request $request): JsonResponse
     {
         try {
+
             $leadID = $request->json('leadID');
             $lead = Lead::where('leadID', $leadID)->first();
             if (!$lead) {
                 throw new NotFoundException('Lead not found', 404);
             }
 
+            $this->validate($request, Lead::getValidationRules($request->all()));
             $userIDInLead = $lead->userID;
             $this->verifyAccessToResource($userIDInLead, $request);
 
@@ -95,7 +98,7 @@ class LeadsController extends BaseController
             $response = $this->createResponseData($lead, 'object');
             return response()->json($response);
         } catch (ValidationException $e) {
-            return response()->json(['error' => $e->validator->errors()], 400);
+            return $this->handleError(new CustomValidationException($e->getMessage()));
         } catch (Exception $e) {
             return $this->handleError($e);
         }

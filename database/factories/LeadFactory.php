@@ -32,8 +32,7 @@ class LeadFactory extends Factory
         $contactPerson = $firstName . ' ' . $lastName;
         $contactPhone = $faker->phoneNumber;
         $contactEmail = iconv('UTF-8', 'ASCII//TRANSLIT', $firstName . '.' . $lastName . rand(0, 99) . '@' . 'swiftsales' . '.fi');
-        $header = $faker->sentence;
-        $description = $faker->paragraph;
+        $notes = $faker->paragraph;
         $userID = User::all()->random()->userID;
 
         return [
@@ -43,8 +42,7 @@ class LeadFactory extends Factory
             'contactPerson' => $contactPerson,
             'contactPhone' => $contactPhone,
             'contactEmail' => $contactEmail,
-            'header' => $header,
-            'description' => $description,
+            'notes' => $notes,
         ];
     }
 }

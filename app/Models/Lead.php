@@ -28,20 +28,18 @@ class Lead extends BaseModel implements AuthenticatableContract, AuthorizableCon
         'contactPerson',
         'contactPhone',
         'contactEmail',
-        'header',
-        'description'
+        'notes',
     ];
 
     public static function getValidationRules(array $fieldsToValidate): array
     {
         $validationRules =  [
-            'businessID' => ['string'],
-            'companyName' => ['string', 'required'],
-            'contactPerson' => ['string'],
-            'contactPhone' => ['string'],
-            'contactEmail' => ['email'],
-            'header' => ['string'],
-            'description' => ['string']
+            'businessID' => ['string', 'max:100'],
+            'companyName' => ['string', 'required', 'max:100'],
+            'contactPerson' => ['string', 'max:100'],
+            'contactPhone' => ['string', 'max:100'],
+            'contactEmail' => ['email', 'max:100'],
+            'notes' => ['string', 'max:1000'],
         ];
 
         if (
